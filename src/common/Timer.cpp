@@ -28,6 +28,7 @@ TimerID Timer::Start(ITimerCallback *pCaller, unsigned long duration, uint8_t da
 	if (pFirst == NULL || pFirst->id != 1u) {
 		if (pFirst != NULL) newNode->pNext = pFirst;
 		pFirst = newNode;
+        newNode->data = data;
 		newNode->id = 1u;
 	} else {
 		for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext ) {
