@@ -45,6 +45,32 @@ public:
         }
         return false;
     }
+
+    virtual bool Insert(T item, int index)
+    {
+        if (size < maxSize) {
+
+            if (index >= size) {
+                return Append(item);
+            }
+
+            T prevItem = NULL;
+            size++;
+            for (int i = index; i < size; i++) {
+                if (prevItem == NULL) {
+                    prevItem = arr[i];
+                    arr[i] = item;
+                } else {
+                    T itm = arr[i];
+                    arr[i] = prevItem;
+                    prevItem = itm;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
     virtual T UnshiftFirst()
     {
         if (size == 0) {
@@ -94,6 +120,13 @@ public:
     T PeekLast() {
         if (size > 0) {
             return arr[size - 1];
+        }
+        return NULL;
+    }
+
+    T Peek(int index) {
+        if (size > 0 && index < size) {
+            return arr[index];
         }
         return NULL;
     }

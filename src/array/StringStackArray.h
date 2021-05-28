@@ -33,4 +33,20 @@ public:
 
         return pCopy;
     }
+    char *InsertCopy(char *item, int index)
+    {
+        if (item == NULL) return NULL;
+        if (item[0] == 0) return NULL;
+        if (IsFull()) return NULL;
+        if (Contains(item)) return NULL;
+
+        char *pCopy = (char *)malloc(strlen(item) + 1);
+        strcpy(pCopy, item);
+        if (!Insert(pCopy, index)) {
+            free(pCopy);
+            return NULL;
+        }
+
+        return pCopy;
+    }
 };

@@ -7,6 +7,7 @@ typedef uint16_t TimerID;
 typedef uint8_t TimerID;
 #endif
 
+#define MILLI_SECONDS 1000ul
 #define MICRO_SECONDS 1000000ul
 
 class ITimerCallback
