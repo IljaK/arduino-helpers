@@ -18,6 +18,7 @@ public:
 	void StartTimeoutTimer(unsigned long microSecTimeOut);
 	void StopTimeoutTimer();
 	void OnTimerComplete(TimerID timerId, uint8_t data) override;
+	void OnTimerStop(TimerID timerId, uint8_t data) override;
 
 	virtual bool IsBusy();
 

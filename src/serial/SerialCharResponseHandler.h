@@ -10,11 +10,11 @@ private:
 
 	size_t separatorMatchedLength = 0;
 
-	void ResetBuffer();
 	bool AppendSymbolToBuffer(uint8_t symbol);
 	bool IsSeparatorRemainMatch(int remainSeparatorLength, uint8_t symbol);
 
 protected:
+	void ResetBuffer();
 	virtual bool LoadSymbolFromBuffer(uint8_t symbol);
     size_t maxBufferLength = 0;
 	size_t bufferLength = 0;

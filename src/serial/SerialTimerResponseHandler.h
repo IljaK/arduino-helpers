@@ -26,6 +26,7 @@ public:
 	void FlushData() override;
 	void ResponseDetectedInternal(bool IsTimeOut, bool isOverFlow = false) override;
 	void OnTimerComplete(TimerID timerId, uint8_t data) override;
+    void OnTimerStop(TimerID timerId, uint8_t data) override;
 
 	virtual unsigned long ResponseByteTimeOut();
 
