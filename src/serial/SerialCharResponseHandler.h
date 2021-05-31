@@ -7,7 +7,6 @@ class SerialCharResponseHandler: public BaseSerialHandler
 private:
 	char *separator;
 	size_t separatorLength;
-
 	size_t separatorMatchedLength = 0;
 
 	void ResetBuffer();

@@ -11,9 +11,6 @@ ITimerCallback::~ITimerCallback()
 {
 	Timer::StopAll(this);
 };
-void ITimerCallback::OnTimerComplete(TimerID timerId, uint8_t data)
-{ 
-};
 
 TimerID Timer::Start(ITimerCallback *pCaller, unsigned long duration, uint8_t data)
 {

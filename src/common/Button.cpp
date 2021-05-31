@@ -60,3 +60,10 @@ void Button::OnTimerComplete(TimerID timerId, uint8_t data)
         ProcessClick();
     }
 }
+
+void Button::OnTimerStop(TimerID timerId, uint8_t data)
+{
+    if (timerId == multiClickTimer) {
+        multiClickTimer = 0;
+    }
+}
