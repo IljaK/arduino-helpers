@@ -24,14 +24,6 @@ void BaseSerialHandler::OnTimerStop(TimerID timerId, uint8_t data)
 	}
 }
 
-void BaseSerialHandler::OnTimerStop(TimerID timerId, uint8_t data)
-{
-	if (responseTimeoutTimer == timerId) {
-		responseTimeoutTimer = 0;
-	}
-}
-
-
 void BaseSerialHandler::ResponseDetectedInternal(bool IsTimeOut, bool isOverFlow)
 {
 	StopTimeoutTimer();
