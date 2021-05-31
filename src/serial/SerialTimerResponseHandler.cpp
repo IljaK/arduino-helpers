@@ -28,6 +28,15 @@ void SerialTimerResponseHandler::OnTimerComplete(TimerID timerId, uint8_t data)
 	}
 }
 
+void SerialTimerResponseHandler::OnTimerStop(TimerID timerId, uint8_t data)
+{
+	if (messageTimer == timerId) {
+		messageTimer = 0;
+	} else {
+		BaseSerialHandler::OnTimerStop(timerId, data);
+	}
+}
+
 void SerialTimerResponseHandler::StartTimer()
 {
 	StopTimer();
