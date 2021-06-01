@@ -6,8 +6,8 @@ class StackArray
 {
 protected:
     T *arr = NULL;
-    uint8_t maxSize = 0;
-    uint8_t size = 0;
+    size_t maxSize = 0;
+    size_t size = 0;
     virtual bool IsElementEqual(T item1, T item2)
     {
         return item1 == item2;
@@ -19,7 +19,7 @@ protected:
     }
 
 public:
-    StackArray (const uint8_t maxSize)
+    StackArray (const size_t maxSize)
     {
         arr = (T *) calloc(maxSize, sizeof(T));
         this->maxSize = maxSize;
@@ -27,7 +27,7 @@ public:
 
     virtual ~StackArray()
     {
-        for(uint8_t i = 0; i < size; i++) {
+        for(size_t i = 0; i < size; i++) {
             FreeItem(arr[i]);
             arr[i] = NULL;
         }
@@ -46,7 +46,7 @@ public:
         return false;
     }
 
-    virtual bool Insert(T item, int index)
+    virtual bool Insert(T item, size_t index)
     {
         if (size < maxSize) {
 
@@ -56,7 +56,7 @@ public:
 
             T prevItem = NULL;
             size++;
-            for (int i = index; i < size; i++) {
+            for (size_t i = index; i < size; i++) {
                 if (prevItem == NULL) {
                     prevItem = arr[i];
                     arr[i] = item;
@@ -77,7 +77,7 @@ public:
             return NULL;
         }
         T first = arr[0];
-        for(uint8_t i = 0; i < size; i++) {
+        for(size_t i = 0; i < size; i++) {
             if (i == size - 1) {
                 arr[i] = NULL;
                 break;
@@ -88,12 +88,35 @@ public:
         size--;
         return first;
     }
-    uint8_t MaxSize()
+
+    virtual T Unshift(size_t index)
+    {
+        if (size == 0) {
+            return NULL;
+        }
+        if (index >= maxSize) {
+            return NULL;
+        }
+
+        T item = arr[index];
+        for(size_t i = index; i < size; i++) {
+            if (i == size - 1) {
+                arr[i] = NULL;
+                break;
+            }
+            arr[i] = arr[i+1];
+            if (arr[i] == NULL) break;
+        }
+        size--;
+        return item;
+    }
+
+    size_t MaxSize()
     {
         if (arr == NULL) return 0;
         return maxSize;
     }
-    uint8_t Size()
+    size_t Size()
     {
         return size;
     }
@@ -104,7 +127,7 @@ public:
 
     virtual bool Contains(T item)
     {
-        for(uint8_t i = 0; i < maxSize; i++) {
+        for(size_t i = 0; i < maxSize; i++) {
             if (arr[i] == NULL) return false;
             if (IsElementEqual(item, arr[i])) return true;
         }
@@ -124,7 +147,7 @@ public:
         return NULL;
     }
 
-    T Peek(int index) {
+    T Peek(size_t index) {
         if (size > 0 && index < size) {
             return arr[index];
         }

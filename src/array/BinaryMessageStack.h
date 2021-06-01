@@ -21,10 +21,10 @@ protected:
         free(item);
     }
 public:
-    BinaryMessageStack(const uint8_t maxSize):StackArray(maxSize) {}
+    BinaryMessageStack(const size_t maxSize):StackArray(maxSize) {}
 
     virtual ~BinaryMessageStack() {
-        for(uint8_t i = 0; i < size; i++) {
+        for(size_t i = 0; i < size; i++) {
             if (arr[i] == NULL) break;
             free(arr[i]->data);
             free(arr[i]);

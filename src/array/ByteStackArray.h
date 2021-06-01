@@ -39,7 +39,7 @@ private:
 
     }
 
-    ByteArray * InsertNewItem(uint8_t index) {
+    ByteArray * InsertNewItem(size_t index) {
         arr[index] = (ByteArray *)malloc(sizeof(ByteArray));
         arr[index]->length = 0;
         arr[index]->array = NULL;
@@ -47,7 +47,7 @@ private:
         return arr[index];
     }
 
-    uint8_t AppendInternal(uint8_t *data, uint8_t length) {
+    size_t AppendInternal(uint8_t *data, uint8_t length) {
         if (length == 0) return 0;
         if (data == NULL) return 0;
 
@@ -75,7 +75,7 @@ protected:
     }
 
 public:
-    ByteStackArray(const uint8_t maxSize, uint8_t maxItemLength):StackArray(maxSize) {
+    ByteStackArray(const size_t maxSize, uint8_t maxItemLength):StackArray(maxSize) {
         this->maxItemLength = maxItemLength;
     }
 
@@ -88,10 +88,10 @@ public:
         return false;
     }
 
-    uint8_t Append(const uint8_t *item, uint8_t length) {
-        uint8_t remain = length;
+    size_t Append(const uint8_t *item, uint8_t length) {
+        size_t remain = length;
         while (remain > 0) {
-            uint8_t added = AppendInternal((uint8_t *)item + (length - remain), remain);
+            size_t added = AppendInternal((uint8_t *)item + (length - remain), remain);
             //Serial.printf("Added: %u\n", added);
             if (added == 0) {
                 break;

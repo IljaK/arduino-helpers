@@ -7,7 +7,7 @@ protected:
         free(item);
     }
 public:
-    StringStackArray(const uint8_t maxSize):StackArray(maxSize) {}
+    StringStackArray(const size_t maxSize):StackArray(maxSize) {}
 
     bool IsElementEqual(char * item1, char * item2) override
     {
@@ -33,7 +33,7 @@ public:
 
         return pCopy;
     }
-    char *InsertCopy(char *item, int index)
+    char *InsertCopy(char *item, size_t index)
     {
         if (item == NULL) return NULL;
         if (item[0] == 0) return NULL;
