@@ -27,13 +27,17 @@ public:
 
     virtual ~StackArray()
     {
+        Clear();
+        free(arr);
+        arr = NULL;
+    }
+
+    virtual void Clear() {
         for(size_t i = 0; i < size; i++) {
             FreeItem(arr[i]);
             arr[i] = NULL;
         }
         size = 0;
-        free(arr);
-        arr = NULL;
     }
 
     virtual bool Append(T item)
