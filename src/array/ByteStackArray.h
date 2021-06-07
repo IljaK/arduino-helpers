@@ -3,21 +3,22 @@
 #include "StackArray.h"
 
 struct ByteArray {
-    uint8_t length;
+    size_t length;
     uint8_t * array;
 };
 
 class ByteStackArray: public StackArray<ByteArray *>
 {
 private:
-    uint8_t maxItemLength = 0;
+    const size_t maxItemLength;
 
-    uint8_t AppendToItem(ByteArray *item , uint8_t * data, uint8_t length) {
+    size_t AppendToItem(ByteArray *item , uint8_t * data, size_t length) {
 
-        uint8_t append = maxItemLength - item->length;
+        size_t append = maxItemLength - item->length;
         if (append > length) append = length;
 
-        //Serial.printf("AppendToItem: %u\n", append);
+        //Serial.print("AppendToItem: ");
+        //Serial.println(append);
 
         uint8_t * array = NULL;
         if (item->array == NULL) {
@@ -47,7 +48,7 @@ private:
         return arr[index];
     }
 
-    size_t AppendInternal(uint8_t *data, uint8_t length) {
+    size_t AppendInternal(uint8_t *data, size_t length) {
         if (length == 0) return 0;
         if (data == NULL) return 0;
 
@@ -75,8 +76,9 @@ protected:
     }
 
 public:
-    ByteStackArray(const size_t maxSize, uint8_t maxItemLength):StackArray(maxSize) {
-        this->maxItemLength = maxItemLength;
+    ByteStackArray(const size_t maxSize, const size_t maxItemLength):
+        StackArray(maxSize),
+        maxItemLength(maxItemLength) {
     }
 
     bool IsElementEqual(ByteArray * item1, ByteArray * item2) override {
@@ -88,11 +90,12 @@ public:
         return false;
     }
 
-    size_t Append(const uint8_t *item, uint8_t length) {
+    size_t Append(const uint8_t *item, size_t length) {
         size_t remain = length;
         while (remain > 0) {
             size_t added = AppendInternal((uint8_t *)item + (length - remain), remain);
-            //Serial.printf("Added: %u\n", added);
+            //Serial.print("Added:");
+            //Serial.println(added);
             if (added == 0) {
                 break;
             }

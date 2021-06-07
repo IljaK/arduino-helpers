@@ -6,7 +6,7 @@ class StackArray
 {
 protected:
     T *arr = NULL;
-    size_t maxSize = 0;
+    const size_t maxSize;
     size_t size = 0;
     virtual bool IsElementEqual(T item1, T item2)
     {
@@ -19,10 +19,9 @@ protected:
     }
 
 public:
-    StackArray (const size_t maxSize)
+    StackArray (const size_t maxSize):maxSize(maxSize)
     {
         arr = (T *) calloc(maxSize, sizeof(T));
-        this->maxSize = maxSize;
     }
 
     virtual ~StackArray()
