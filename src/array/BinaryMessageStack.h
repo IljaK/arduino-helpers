@@ -17,7 +17,9 @@ class BinaryMessageStack: public StackArray<BinaryMessage *>
 {
 protected:
     void FreeItem(BinaryMessage * item) override {
-        free(item->data);
+        if (item->data != NULL) {
+            free(item->data);
+        }
         free(item);
     }
 public:

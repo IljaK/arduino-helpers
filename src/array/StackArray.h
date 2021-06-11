@@ -76,20 +76,7 @@ public:
 
     virtual T UnshiftFirst()
     {
-        if (size == 0) {
-            return NULL;
-        }
-        T first = arr[0];
-        for(size_t i = 0; i < size; i++) {
-            if (i == size - 1) {
-                arr[i] = NULL;
-                break;
-            }
-            arr[i] = arr[i+1];
-            if (arr[i] == NULL) break;
-        }
-        size--;
-        return first;
+        return Unshift(0);
     }
 
     virtual T Unshift(size_t index)
