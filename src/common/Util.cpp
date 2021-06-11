@@ -313,7 +313,6 @@ uint8_t initPullupPin(uint8_t pin, PinMode mode, voidFuncPtr isrFunc)
     return val;
 }
 
-// outBuffer must be min size of: 2 * length + 1
 size_t encodeToHex(uint8_t *inArray, size_t length, char *outBuffer)
 {
     size_t wrote = 0;
@@ -328,6 +327,31 @@ size_t encodeToHex(uint8_t *inArray, size_t length, char *outBuffer)
         wrote += 2;
     }
     return wrote;
+}
+size_t decodeFromHex(char *inBuffer, uint8_t *outArray, size_t bytesLen)
+{
+    for (size_t i = 0; i < bytesLen; i++) {
+        uint8_t n1 = inBuffer[i * 2];
+        uint8_t n2 = inBuffer[i * 2 + 1];
+
+        if (n1 == 0 || n2 == 0) {
+            return i;
+        }
+
+        if (n1 > '9') {
+            n1 = (n1 - 'A') + 10;
+        } else {
+            n1 = (n1 - '0');
+        }
+
+        if (n2 > '9') {
+            n2 = (n2 - 'A') + 10;
+        } else {
+            n2 = (n2 - '0');
+        }
+        outArray[i] = (n1 << 4) | n2;
+    }
+    return bytesLen;
 }
 /*
 #ifndef ESP32

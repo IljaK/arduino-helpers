@@ -62,4 +62,6 @@ extern uint32_t remainRam();
 extern double readAnalogVoltage(uint8_t pin);
 extern uint8_t initPullupPin(uint8_t pin, PinMode mode, voidFuncPtr isrFunc);
 
+// outBuffer must be min size of: 2 * length + 1
 extern size_t encodeToHex(uint8_t *inArray, size_t length, char *outBuffer);
+extern size_t decodeFromHex(char *inBuffer, uint8_t *outArray, size_t length);
