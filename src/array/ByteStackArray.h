@@ -10,8 +10,6 @@ struct ByteArray {
 class ByteStackArray: public StackArray<ByteArray *>
 {
 private:
-    const size_t maxItemLength;
-
     size_t AppendToItem(ByteArray *item , uint8_t * data, size_t length) {
 
         size_t append = maxItemLength - item->length;
@@ -70,12 +68,18 @@ private:
         return AppendToItem(InsertNewItem(Size()), data, length);
     }
 protected:
-    void FreeItem(ByteArray * item) override {
-        free(item->array);
-        free(item);
-    }
 
 public:
+    void FreeItem(ByteArray * item) override {
+        if (item != NULL) {
+            if (item->array != NULL) {
+                free(item->array);
+            }
+            free(item);
+        }
+    }
+    const size_t maxItemLength;
+
     ByteStackArray(const size_t maxSize, const size_t maxItemLength):
         StackArray(maxSize),
         maxItemLength(maxItemLength) {

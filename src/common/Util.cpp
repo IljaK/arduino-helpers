@@ -329,7 +329,6 @@ size_t encodeToHex(uint8_t *inArray, size_t length, char *outBuffer)
     }
     return wrote;
 }
-
 /*
 #ifndef ESP32
 char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
