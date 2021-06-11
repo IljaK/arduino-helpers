@@ -61,3 +61,5 @@ extern size_t writeASCII(Print *stream, unsigned long data, int radix = 10);
 extern uint32_t remainRam();
 extern double readAnalogVoltage(uint8_t pin);
 extern uint8_t initPullupPin(uint8_t pin, PinMode mode, voidFuncPtr isrFunc);
+
+extern size_t encodeToHex(uint8_t *inArray, size_t length, char *outBuffer);
