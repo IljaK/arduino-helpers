@@ -12,14 +12,10 @@ protected:
     {
         return item1 == item2;
     }
-
-    virtual void FreeItem(T item)
-    {
-
-    }
+    virtual void FreeItem(T item) = 0;
 
 public:
-    StackArray (const size_t maxSize):maxSize(maxSize)
+    StackArray(const size_t maxSize):maxSize(maxSize)
     {
         arr = (T *) calloc(maxSize, sizeof(T));
     }

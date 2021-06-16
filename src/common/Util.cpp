@@ -243,42 +243,6 @@ void outPrintf(const char *format, ...)
 }
 */
 
-size_t writeASCII(Print *stream, int data, int radix)
-{
-    const size_t size = 16;
-    char outString[size];
-    outString[0] = 0;
-    itoa(data, outString, radix);
-    return stream->print((const char *)outString);
-}
-
-size_t writeASCII(Print *stream, unsigned int data, int radix)
-{
-    const size_t size = 8;
-    char outString[size];
-    outString[0] = 0;
-    utoa(data, outString, radix);
-    return stream->print((const char *)outString);
-}
-
-size_t writeASCII(Print *stream, long data, int radix)
-{
-    const size_t size = 8;
-    char outString[size];
-    outString[0] = 0;
-    ltoa(data, outString, radix);
-    return stream->print((const char *)outString);
-}
-
-size_t writeASCII(Print *stream, unsigned long data, int radix)
-{
-    const size_t size = 32;
-    char outString[size];
-    outString[0] = 0;
-    ultoa(data, outString, radix);
-    return stream->print((const char *)outString);
-}
-
 long readVCC() {
 #if ARDUINO_TEST 
 	return 5000;
