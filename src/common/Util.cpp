@@ -8,6 +8,8 @@
 
 Stream *outStream = NULL;
 
+void(* rebootDeviceFunc) (void) = 0;
+
 uint8_t reverseByte(uint8_t x)
 {
 	x = (((x & 0xf0f0f0f0) >> 4) | ((x & 0x0f0f0f0f) << 4));
