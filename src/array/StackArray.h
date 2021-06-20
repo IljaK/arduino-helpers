@@ -12,7 +12,12 @@ protected:
     {
         return item1 == item2;
     }
-    virtual void FreeItem(T item) = 0;
+    virtual void FreeItem(T item) 
+    {
+        if (item != NULL) {
+            free(item);
+        }
+    }
 
 public:
     StackArray(const size_t maxSize):maxSize(maxSize)
