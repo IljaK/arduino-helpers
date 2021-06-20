@@ -1,10 +1,9 @@
 #include "BaseSerialMock.h"
 
-BaseSerialMock::BaseSerialMock(SerialStream* serial)
+BaseSerialMock::BaseSerialMock(Stream* serial)
 {
 	this->serialStream = serial;
 }
-
 
 BaseSerialMock::~BaseSerialMock()
 {

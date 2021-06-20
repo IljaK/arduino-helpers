@@ -1,17 +1,17 @@
 #pragma once
 #include "serial/BaseSerialHandler.h"
-#include "SerialStream.h"
+#include <Stream.h>
 
 class BaseSerialMock
 {
 public:
-	SerialStream* serialStream;
+	Stream* serialStream;
 
 	bool isResponseReceived = false;
 	bool isResponseTimeOut = false;
 	bool isResponseOverFlow = false;
 
-	BaseSerialMock(SerialStream* serial);
+	BaseSerialMock(Stream* serial);
 	~BaseSerialMock();
 
 	void HandleResponseReceived(bool IsTimeOut, bool isOverFlow);

@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "../mock/SerialTimerResponseHandlerMock.h"
 #include "../mock/BaseSerialHandlerMock.h"
-#include "../mock/SerialStream.h"
+#include <Stream.h>
 #include "../mock/TimerMock.h"
 
 TEST(SerialTimeResponseHandlerTest, BufferOverflowTest)
@@ -12,7 +12,7 @@ TEST(SerialTimeResponseHandlerTest, BufferOverflowTest)
 
 	char data1[] = "some arg"; // length = 8
 
-	SerialStream serial;
+	Stream serial;
 	SerialTimerResponseHandlerMock timerResponseHandler(&serial);
 
 	timerResponseHandler.Loop();
@@ -53,7 +53,7 @@ TEST(SerialTimeResponseHandlerTest, ResponseTimerTest)
 	timeOffset = 0;
 	TimerMock::Reset();
 
-	SerialStream serial;
+	Stream serial;
 	SerialTimerResponseHandlerMock timerResponseHandler(&serial);
 
 	Timer::Loop();

@@ -2,7 +2,8 @@
 #include "common/Timer.h"
 #include <Arduino.h>
 #include "mock/TimerMock.h"
-TEST(Timer, TimerTestRunStop)
+
+TEST(TimerTest, TimerTestRunStop)
 {
 	timeOffset = 0;
 	TimerMock::Reset();
@@ -31,7 +32,7 @@ TEST(Timer, TimerTestRunStop)
 
 }
 
-TEST(Timer, TimerTestOverflowMicros)
+TEST(TimerTest, TimerTestOverflowMicros)
 {
 	timeOffset = ULONG_MAX - 500000ul;
 	Timer::Loop();
@@ -60,7 +61,7 @@ TEST(Timer, TimerTestOverflowMicros)
 	Timer::StopAll(timerMock);
 }
 
-TEST(Timer, TimerFillTest)
+TEST(TimerTest, TimerFillTest)
 {
 	timeOffset = 0;
 	TimerMock::Reset();
@@ -114,7 +115,7 @@ TEST(Timer, TimerFillTest)
 	}
 }
 
-TEST(Timer, TimerAddOnCallbackTest)
+TEST(TimerTest, TimerAddOnCallbackTest)
 {
 	timeOffset = 0;
 	TimerMock::Reset();

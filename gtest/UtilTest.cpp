@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "common/Util.h"
 
-TEST(Util, SplitArgumentsTest)
+TEST(UtilTest, SplitArgumentsTest)
 {
 	char source[] = "\"+37299685675\", \"Ilja aux-1\",, \"19/07/31,13:29:43+12\"";
 	char *arguments[10];
@@ -16,7 +16,7 @@ TEST(Util, SplitArgumentsTest)
 	EXPECT_EQ(args, 3);
 }
 
-TEST(Util, Bit8ValueTest)
+TEST(UtilTest, Bit8ValueTest)
 {
 	uint8_t expect = 235; // 11101011
 
@@ -34,7 +34,7 @@ TEST(Util, Bit8ValueTest)
 	EXPECT_EQ(input, expect);
 }
 
-TEST(Util, Bit16ValueTest)
+TEST(UtilTest, Bit16ValueTest)
 {
 	uint16_t expect = 235; // 11101011
 
@@ -52,7 +52,7 @@ TEST(Util, Bit16ValueTest)
 	EXPECT_EQ(input, expect);
 }
 
-TEST(Util, ReverseByteTest)
+TEST(UtilTest, ReverseByteTest)
 {
     EXPECT_EQ(reverseByte(0b00001111), 0b11110000);
 
@@ -60,7 +60,7 @@ TEST(Util, ReverseByteTest)
 }
 
 
-TEST(Util, HexEncodingTest)
+TEST(UtilTest, HexEncodingTest)
 {
     char data[] = "some test data";
     char hex[128];

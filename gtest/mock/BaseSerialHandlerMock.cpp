@@ -1,12 +1,9 @@
 #include <gtest/gtest.h>
 #include "BaseSerialHandlerMock.h"
 
-
-
-BaseSerialHandlerMock::BaseSerialHandlerMock(SerialStream *serial):BaseSerialHandler(serial), BaseSerialMock(serial)
+BaseSerialHandlerMock::BaseSerialHandlerMock(Stream *serial):BaseSerialHandler(serial), BaseSerialMock(serial)
 {
 }
-
 
 BaseSerialHandlerMock::~BaseSerialHandlerMock()
 {

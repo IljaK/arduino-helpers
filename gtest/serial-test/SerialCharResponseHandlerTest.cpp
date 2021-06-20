@@ -2,7 +2,7 @@
 #include "../mock/SerialCharResponseHandlerMock.h"
 #include "../mock/BaseSerialHandlerMock.h"
 #include <Arduino.h>
-#include "../mock/SerialStream.h"
+#include <Stream.h>
 #include "../mock/TimerMock.h"
 
 
@@ -13,7 +13,7 @@ TEST(SerialCharResponseHandlerTest, SeparatorParsingTest)
 	TimerMock::Reset();
 
 	char separator[] = "\r\r\r\n";
-	SerialStream serial;
+	Stream serial;
 	SerialCharResponseHandlerMock charResponseHandler(128, (const char *)separator, &serial);
 
 	char data1[] = "some args";
@@ -59,7 +59,7 @@ TEST(SerialCharResponseHandlerTest, BufferOverflowTest)
 	char data1[] = "some arg"; // length = 8
 
 	char separator[] = "\r\n";
-	SerialStream serial;
+	Stream serial;
 	SerialCharResponseHandlerMock charResponseHandler(128, (const char *)separator, &serial);
 
 	charResponseHandler.Loop();

@@ -8,7 +8,7 @@
 
 
 
-TEST(VoltMeter, MeasureValueTest)
+TEST(VoltMeterTest, MeasureValueTest)
 {
 	timeOffset = 0;
 	TimerMock::Reset();

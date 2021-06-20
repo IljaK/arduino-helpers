@@ -1,10 +1,9 @@
 #include "SerialCharResponseHandlerMock.h"
 
-SerialCharResponseHandlerMock::SerialCharResponseHandlerMock(const size_t bufferSize, const char *separator, SerialStream * stream):SerialCharResponseHandler(bufferSize, separator, stream), BaseSerialMock(stream)
+SerialCharResponseHandlerMock::SerialCharResponseHandlerMock(const size_t bufferSize, const char *separator, Stream * stream):SerialCharResponseHandler(bufferSize, separator, stream), BaseSerialMock(stream)
 {
 	Clear();
 }
-
 
 SerialCharResponseHandlerMock::~SerialCharResponseHandlerMock()
 {
