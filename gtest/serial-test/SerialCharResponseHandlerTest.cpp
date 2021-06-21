@@ -60,19 +60,22 @@ TEST(SerialCharResponseHandlerTest, BufferOverflowTest)
 
 	char separator[] = "\r\n";
 	Stream serial;
-	SerialCharResponseHandlerMock charResponseHandler(128, (const char *)separator, &serial);
+
+    const size_t bufferSize = 128;
+
+	SerialCharResponseHandlerMock charResponseHandler(bufferSize, (const char *)separator, &serial);
 
 	charResponseHandler.Loop();
 
-	int maxIterations = SERIAL_RX_BUFFER_SIZE / strlen(data1) + 1;
+	int maxIterations = bufferSize / strlen(data1);
 
-	for (int i = 0; i < maxIterations; i++) {
+	for (int i = 0; i <= maxIterations; i++) {
 		serial.AddRXBuffer(data1);
 		charResponseHandler.Loop();
 		if (strlen(charResponseHandler.receivedCommand) > 0) {
 
 			EXPECT_TRUE(charResponseHandler.isResponseOverFlow);
-			EXPECT_EQ(i, maxIterations - 2);
+			EXPECT_EQ(i, maxIterations - 1);
 			return;
 		}
 	}
