@@ -11,8 +11,6 @@
 
 constexpr uint16_t ANALOG_UNITS_RESOLUTION_RANGE = ANALOG_UNITS_RESOLUTION - 1;
 
-constexpr uint8_t CR_ASCII_SYMBOL = 13u; // CR
-constexpr uint8_t LF_ASCII_SYMBOL = 10u; // LF
 constexpr uint8_t CRTLZ_ASCII_SYMBOL = 26u; // ctrl+z
 constexpr uint8_t ESC_ASCII_SYMBOL = 27u; // ESC
 
