@@ -1,6 +1,6 @@
 #include "Util.h"
 #include <stdarg.h>
-#include <string.h>
+#include <cstring>
 //#pragma warning(disable : 4996)
 #if __arm__
     extern "C" char* sbrk(int incr);
