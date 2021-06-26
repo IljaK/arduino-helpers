@@ -313,21 +313,33 @@ uint8_t initPullupPin(uint8_t pin, PinMode mode, voidFuncPtr isrFunc)
     return val;
 }
 
+inline uint8_t fromHexOctetToChar(uint8_t val) {
+    return (char)(val > 9 ? 'A' + val - 10 : '0' + val);
+}
+
 size_t encodeToHex(uint8_t *inArray, size_t length, char *outBuffer)
 {
     size_t wrote = 0;
     for (size_t i = 0; i < length; i++) {
         uint8_t b = inArray[i];
-        uint8_t n1 = (b >> 4) & 0x0f;
-        uint8_t n2 = (b & 0x0f);
-        outBuffer[0] = (char)(n1 > 9 ? 'A' + n1 - 10 : '0' + n1);
-        outBuffer[1] = (char)(n2 > 9 ? 'A' + n2 - 10 : '0' + n2);
+        outBuffer[0] = fromHexOctetToChar((b >> 4) & 0x0f);
+        outBuffer[1] = fromHexOctetToChar((b & 0x0f));
         outBuffer[2] = 0;
         outBuffer += 2;
         wrote += 2;
     }
     return wrote;
 }
+
+inline uint8_t fromCharToHexOctet(uint8_t val) {
+    if (val > '9') {
+        val = (val - 'A') + 10;
+    } else {
+        val = (val - '0');
+    }
+    return val;
+}
+
 size_t decodeFromHex(char *inBuffer, uint8_t *outArray, size_t bytesLen)
 {
     for (size_t i = 0; i < bytesLen; i++) {
@@ -337,22 +349,13 @@ size_t decodeFromHex(char *inBuffer, uint8_t *outArray, size_t bytesLen)
         if (n1 == 0 || n2 == 0) {
             return i;
         }
-
-        if (n1 > '9') {
-            n1 = (n1 - 'A') + 10;
-        } else {
-            n1 = (n1 - '0');
-        }
-
-        if (n2 > '9') {
-            n2 = (n2 - 'A') + 10;
-        } else {
-            n2 = (n2 - '0');
-        }
+        n1 = fromCharToHexOctet(n1);
+        n2 = fromCharToHexOctet(n2);
         outArray[i] = (n1 << 4) | n2;
     }
     return bytesLen;
 }
+
 /*
 #ifndef ESP32
 char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
