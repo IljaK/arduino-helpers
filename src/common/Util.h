@@ -11,18 +11,13 @@
 
 constexpr uint16_t ANALOG_UNITS_RESOLUTION_RANGE = ANALOG_UNITS_RESOLUTION - 1;
 
-constexpr uint8_t CR_ASCII_SYMBOL = 13u; // CR
-constexpr uint8_t LF_ASCII_SYMBOL = 10u; // LF
 constexpr uint8_t CRTLZ_ASCII_SYMBOL = 26u; // ctrl+z
 constexpr uint8_t ESC_ASCII_SYMBOL = 27u; // ESC
 
-constexpr char RESPONSE_SEPARATOR[] = "\r\n";
-
-constexpr uint32_t SERIAL_RESPONSE_TIMEOUT = 1000000u;
-constexpr uint32_t GSM_CMD_DELAY = 500000u;
-
 //constexpr uint32_t baudRates[] = { 1200, 2400, 4800, 9600, 14400, 19200, 28800, 57600, 115200 };
 //temp|out temp|humidity|pressure|voltage|ampers|calculated voltage
+
+extern void(* rebootDeviceFunc) (void);
 
 struct DeviceSpecData {
     uint32_t remainRam = 0;
@@ -49,11 +44,6 @@ extern size_t SplitString(char *source, uint8_t separator, char **subStrArray, s
 
 extern char *ShiftQuotations(char *quatationString);
 extern void ShiftQuotations(char **subStrArray, size_t arraySize);
-
-extern size_t writeASCII(Print *stream, int data, int radix = 10);
-extern size_t writeASCII(Print *stream, unsigned int data, int radix = 10);
-extern size_t writeASCII(Print *stream, long data, int radix = 10);
-extern size_t writeASCII(Print *stream, unsigned long data, int radix = 10);
 
 //[[deprecated("Replaced by outWrite(), use separate for each argument")]]
 //extern void outPrintf(const char *format, ...);

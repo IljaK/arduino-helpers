@@ -19,17 +19,11 @@ SerialCharResponseHandler::~SerialCharResponseHandler()
 void SerialCharResponseHandler::Loop()
 {
 	if (serial) {
-		int available = serial->available();
-
-		if (available > 0) {
-			uint8_t symbol = 0;
-			for (int i = 0; i < available; i++) {
-
-				serial->readBytes(&symbol, 1);
-
-				if (LoadSymbolFromBuffer(symbol)) return;
-			}
-		}
+        while (serial->available() > 0) {
+            if (LoadSymbolFromBuffer(serial->read())) {
+                return;
+            }
+        }
         if (IsLimitReached()) {
             ResponseDetectedInternal(false, true);
         }
