@@ -46,3 +46,10 @@ void TimerMock::Reset()
 {
 	frameTS = 0;
 }
+
+void TimerMock::StopAll() {
+    while (pFirst != NULL)
+    {
+        Timer::Stop(pFirst->id);
+    }
+}

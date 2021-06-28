@@ -1,11 +1,7 @@
 #pragma once
 #include <Arduino.h>
 
-#if ESP32
-typedef uint16_t TimerID;
-#else
-typedef uint8_t TimerID;
-#endif
+typedef size_t TimerID;
 
 #define MILLI_SECONDS 1000ul
 #define MICRO_SECONDS 1000000ul
@@ -18,12 +14,13 @@ public:
 	virtual void OnTimerStop(TimerID timerId, uint8_t data) {};
 };
 
-typedef void (*timerCompleteCallBack) (TimerID timerId, uint8_t data);
+typedef void (*timerCallBack) (TimerID timerId, uint8_t data);
 
 struct TimerNode
 {
 	ITimerCallback *pCaller = NULL;
 	TimerID id = 0;
+    bool isProcessed = true;
 	unsigned long remain = 0;
 	uint8_t data = 0;
 	TimerNode *pNext = NULL;
@@ -31,16 +28,17 @@ struct TimerNode
 
 class Timer
 {
-private:
+protected:
 #if ESP32
 	static SemaphoreHandle_t xTimerSemaphore;
 #endif
 	static TimerNode *pFirst;
-protected:
 	static unsigned long frameTS;
+    static void SetProcessed(bool value);
+    static bool LoopCompleted(unsigned long delta);
 public:
 	static TimerID Start(ITimerCallback *pCaller, unsigned long duration, uint8_t data = 0);
-	static TimerID Start(timerCompleteCallBack pCallBack, unsigned long duration, uint8_t data = 0);
+	static TimerID Start(timerCallBack completeCB, unsigned long duration, uint8_t data = 0, timerCallBack stopCB = NULL);
 	static void Loop();
 	static bool Stop(TimerID timerId);
 	static bool Contains(ITimerCallback *pCaller, uint8_t data);
@@ -51,18 +49,20 @@ public:
     class TimerCallback: public ITimerCallback
     {
     private:
-        timerCompleteCallBack cb = NULL;
+        timerCallBack completeCB = NULL;
+        timerCallBack stopCB = NULL;
     public:
-        TimerCallback(timerCompleteCallBack cb) {
-            this->cb = cb;
+        TimerCallback(timerCallBack completeCB, timerCallBack stopCB = NULL) {
+            this->completeCB = completeCB;
+            this->stopCB = stopCB;
         };
         ~TimerCallback() { };
         void OnTimerComplete(TimerID timerId, uint8_t data) override {
-            this->cb(timerId, data);
+            if (completeCB != NULL) completeCB(timerId, data);
             delete this;
         }
         void OnTimerStop(TimerID timerId, uint8_t data) override {
-            this->cb(timerId, data);
+            if (stopCB != NULL) stopCB(timerId, data);
             delete this;
         }
     };

@@ -19,5 +19,6 @@ public:
 	unsigned long Remain();
 
 	static void Reset();
+    static void StopAll();
 };
 

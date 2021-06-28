@@ -151,3 +151,22 @@ TEST(TimerTest, TimerAddOnCallbackTest)
 	timeOffset = 0;
 	TimerMock::Reset();
 }
+
+void onTimerComplete(TimerID timer, uint8_t data) {
+    TimerMock::StopAll();
+}
+
+TEST(TimerTest, TimerStopAllOnCompleteTest)
+{
+    timeOffset = 0;
+	TimerMock::Reset();
+
+    for (uint8_t i = 0; i < 10; i++) {
+        Timer::Start(onTimerComplete, (i + 1));
+    }
+
+    for (uint8_t i = 0; i < 10; i++) {
+        timeOffset += 1;
+        TimerMock::Loop();
+    }
+}

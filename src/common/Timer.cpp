@@ -46,13 +46,12 @@ TimerID Timer::Start(ITimerCallback *pCaller, unsigned long duration, uint8_t da
 #endif
 	return id;
 }
-// TODO: Test this
-TimerID Timer::Start(timerCompleteCallBack pCallBack, unsigned long duration, uint8_t data)
+TimerID Timer::Start(timerCallBack completeCB, unsigned long duration, uint8_t data, timerCallBack stopCB)
 {
-    if (pCallBack == NULL) {
+    if (completeCB == NULL) {
         return 0;
     }
-    TimerCallback *tc = new TimerCallback(pCallBack);
+    TimerCallback *tc = new TimerCallback(completeCB, stopCB);
     if (tc == NULL) {
         // Could not allocate?
         return 0;
@@ -73,51 +72,53 @@ void Timer::Loop()
 	unsigned long microsTS = micros();
 	unsigned long delta = microsTS - frameTS;
 	frameTS = microsTS;
-
-
-	TimerNode *pPrev = NULL;
-
-	for (TimerNode* pNode = pFirst; pNode; ) {
-		
-		if (pNode->remain <= delta) {
-			TimerNode *freeNode = pNode;
-			pNode = pNode->pNext;
-
-			if (freeNode == pFirst) {
-				pFirst = pNode;
-				pPrev = NULL;
-			} else {
-				pPrev->pNext = pNode;
-			}
-
-			freeNode->pCaller->OnTimerComplete(freeNode->id, freeNode->data);
-
-			// pPrev node could be changed during callback
-			if (pNode != NULL) {
-				if ((pPrev == NULL && pFirst != pNode) || (pPrev != NULL && pPrev->pNext != pNode)) {
-					for (TimerNode* pN = pFirst; pN; pN = pN->pNext) {
-						if (pN->pNext && pN->pNext == pNode) {
-							pPrev = pN;
-							break;
-						}
-					}
-				}
-			}
-
-			freeNode->remain = 0;
-			freeNode->pNext = NULL;
-			delete(freeNode);
-
-			continue;
-		}
-		pNode->remain -= delta;
-		pPrev = pNode;
-		pNode = pNode->pNext;
-	}
+    SetProcessed(false);
+    while(LoopCompleted(delta)) {
+        // Do nothing, just loop
+    }
 #if ESP32
     xSemaphoreGiveRecursive(xTimerSemaphore);
 #endif
 }
+
+
+void Timer::SetProcessed(bool value)
+{
+    for (TimerNode* pNode = pFirst; pNode; pNode = pNode->pNext) {
+        pNode->isProcessed = value;
+    }
+}
+
+bool Timer::LoopCompleted(unsigned long delta)
+{
+	TimerNode *pPrev = NULL;
+
+	for (TimerNode* pNode = pFirst; pNode; pPrev = pNode, pNode = pNode->pNext) {
+
+		if (pNode->isProcessed) continue;
+        
+		if (pNode->remain <= delta) {
+			if (pPrev == NULL) {
+				pFirst = pNode->pNext;
+			} else {
+				pPrev->pNext = pNode->pNext;
+			}
+
+			pNode->pCaller->OnTimerComplete(pNode->id, pNode->data);
+
+			pNode->remain = 0;
+			pNode->pNext = NULL;
+			delete(pNode);
+
+			return true;
+		} else {
+            pNode->remain -= delta;
+            pNode->isProcessed = true;
+        }
+	}
+    return false;
+}
+
 bool Timer::Stop(TimerID timerId)
 {
 	if (timerId == 0) return false;
