@@ -322,6 +322,21 @@ size_t decodeFromHex(char *inBuffer, uint8_t *outArray, size_t bytesLen)
     return bytesLen;
 }
 
+
+char *makeNewCopy(char *target)
+{
+    if (target == NULL) {
+        return NULL;
+    }
+    char *result = (char*)malloc(strlen(target) + 1);
+    if (result == NULL) {
+        // No more memory
+        return NULL;
+    }
+    strcpy(result, target);
+    return result;
+}
+
 /*
 #ifndef ESP32
 char * dtostrf(double number, signed char width, unsigned char prec, char *s) {

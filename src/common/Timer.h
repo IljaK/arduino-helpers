@@ -56,7 +56,10 @@ public:
             this->completeCB = completeCB;
             this->stopCB = stopCB;
         };
-        ~TimerCallback() { };
+        virtual ~TimerCallback() {
+            this->completeCB = NULL;
+            this->stopCB = NULL;
+        };
         void OnTimerComplete(TimerID timerId, uint8_t data) override {
             if (completeCB != NULL) completeCB(timerId, data);
             delete this;

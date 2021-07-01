@@ -14,10 +14,11 @@ private:
 protected:
 	virtual void ResetBuffer();
 	virtual bool LoadSymbolFromBuffer(uint8_t symbol);
-    size_t maxBufferLength = 0;
 	size_t bufferLength = 0;
 	char *buffer = NULL;
 public:
+    const size_t bufferSize;
+    
 	SerialCharResponseHandler(const size_t bufferSize, const char *separator, Stream * serial);
 	~SerialCharResponseHandler();
 

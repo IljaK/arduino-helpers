@@ -23,13 +23,18 @@ TimerID Timer::Start(ITimerCallback *pCaller, unsigned long duration, uint8_t da
 	newNode->remain = duration;
 
 	if (pFirst == NULL || pFirst->id != 1u) {
-		if (pFirst != NULL) newNode->pNext = pFirst;
+		newNode->pNext = pFirst;
 		pFirst = newNode;
         newNode->data = data;
 		newNode->id = 1u;
 	} else {
+        TimerID maxID = -1;
 		for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext ) {
-			if (pNode->pNext == NULL || pNode->pNext->id - pNode->id > 1) {
+            if (pNode->id == maxID) {
+                newNode->id = 0;
+                break;
+            }
+			if (pNode->pNext == NULL || pNode->id + 1 < pNode->pNext->id) {
 				newNode->pNext = pNode->pNext;
 				pNode->pNext = newNode;
 				newNode->id = pNode->id + 1u;
@@ -40,6 +45,9 @@ TimerID Timer::Start(ITimerCallback *pCaller, unsigned long duration, uint8_t da
 	}
 
 	TimerID id = newNode->id;
+    if (id == 0) {
+        free(newNode);
+    }
 	
 #if ESP32
     xSemaphoreGiveRecursive(xTimerSemaphore);
@@ -71,10 +79,12 @@ void Timer::Loop()
 
 	unsigned long microsTS = micros();
 	unsigned long delta = microsTS - frameTS;
-	frameTS = microsTS;
-    SetProcessed(false);
-    while(LoopCompleted(delta)) {
-        // Do nothing, just loop
+    if (delta > 0) {
+        frameTS = microsTS;
+        SetProcessed(false);
+        while(LoopCompleted(delta)) {
+            // Do nothing, just loop
+        }
     }
 #if ESP32
     xSemaphoreGiveRecursive(xTimerSemaphore);

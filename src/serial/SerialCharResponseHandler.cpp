@@ -1,19 +1,21 @@
 #include "SerialCharResponseHandler.h"
 
-SerialCharResponseHandler::SerialCharResponseHandler(size_t bufferSize, const char *separator, Stream * serial):
-    BaseSerialHandler(serial)
+SerialCharResponseHandler::SerialCharResponseHandler(const size_t bufferSize, const char *separator, Stream * serial):
+    BaseSerialHandler(serial),
+    bufferSize(bufferSize)
 {
-    maxBufferLength = bufferSize;
     buffer = (char *)malloc(bufferSize);
+	buffer[0] = 0;
 	this->separator = (char *)malloc(strlen(separator) + 1);
 	strcpy(this->separator, separator);
-	buffer[0] = 0;
 	separatorLength = strlen(separator);
 }
 
 SerialCharResponseHandler::~SerialCharResponseHandler()
 {
-    free(this->separator);
+    free(separator);
+    separatorLength = 0;
+    free(buffer);
 }
 
 void SerialCharResponseHandler::Loop()
@@ -87,7 +89,7 @@ bool SerialCharResponseHandler::IsSeparatorRemainMatch(int remainSeparatorLength
 
 bool SerialCharResponseHandler::AppendSymbolToBuffer(uint8_t symbol)
 {
-	if (bufferLength + 1 >= maxBufferLength) {
+	if (bufferLength + 1 >= bufferSize) {
 		return false;
 	}
 
@@ -122,5 +124,5 @@ void SerialCharResponseHandler::ResetBuffer() {
 
 bool SerialCharResponseHandler::IsLimitReached()
 {
-	return bufferLength == maxBufferLength;
+	return bufferLength == bufferSize;
 }
