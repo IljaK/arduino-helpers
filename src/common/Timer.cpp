@@ -46,7 +46,7 @@ TimerID Timer::Start(ITimerCallback *pCaller, unsigned long duration, uint8_t da
 
 	TimerID id = newNode->id;
     if (id == 0) {
-        free(newNode);
+        delete newNode;
     }
 	
 #if ESP32
@@ -60,10 +60,6 @@ TimerID Timer::Start(timerCallBack completeCB, unsigned long duration, uint8_t d
         return 0;
     }
     TimerCallback *tc = new TimerCallback(completeCB, stopCB);
-    if (tc == NULL) {
-        // Could not allocate?
-        return 0;
-    }
     TimerID id = Start(tc, duration, data);
     if (id == 0) {
         delete tc;
@@ -113,13 +109,11 @@ bool Timer::LoopCompleted(unsigned long delta)
 			} else {
 				pPrev->pNext = pNode->pNext;
 			}
-
-			pNode->pCaller->OnTimerComplete(pNode->id, pNode->data);
-
 			pNode->remain = 0;
 			pNode->pNext = NULL;
-			delete(pNode);
-
+            
+			pNode->pCaller->OnTimerComplete(pNode->id, pNode->data);
+			delete pNode;
 			return true;
 		} else {
             pNode->remain -= delta;
@@ -151,7 +145,7 @@ bool Timer::Stop(TimerID timerId)
             if (pNode->pCaller) {
                 pNode->pCaller->OnTimerStop(pNode->id, pNode->data);
             }
-			delete(pNode);
+			delete pNode;
 			result = true;
 			break;
 		}
@@ -167,6 +161,7 @@ bool Timer::Stop(TimerID timerId)
 
 void Timer::StopAll(ITimerCallback* pCaller)
 {
+    if (pCaller == NULL) return;
 #if ESP32
 	xSemaphoreTakeRecursive( xTimerSemaphore, portMAX_DELAY );
 #endif
@@ -189,8 +184,7 @@ void Timer::StopAll(ITimerCallback* pCaller)
             if (freeNode != NULL && freeNode->pCaller) {
                 freeNode->pCaller->OnTimerStop(freeNode->id, freeNode->data);
             }
-			delete(freeNode);
-
+			delete freeNode;
 			continue;
 		}
 		pPrev = pNode;
