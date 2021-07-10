@@ -27,5 +27,10 @@ TEST(BinaryMessageStackTest, BufferOverflowTest)
 
     EXPECT_EQ(messageStack.Size(), 1);
 
-    msg = messageStack.Peek();
+    BinaryMessage *msg1 = messageStack.Unshift(0);
+    EXPECT_TRUE(msg == msg1);
+
+    EXPECT_EQ(messageStack.Size(), 0);
+
+    messageStack.FreeItem(msg);
 }

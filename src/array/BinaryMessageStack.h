@@ -15,13 +15,6 @@ typedef void (*BinaryMessageCallback)(BinaryMessage *);
 
 class BinaryMessageStack: public StackArray<BinaryMessage *>
 {
-protected:
-    void FreeItem(BinaryMessage * item) override {
-        if (item->data != NULL) {
-            free(item->data);
-        }
-        free(item);
-    }
 public:
     BinaryMessageStack(const size_t maxSize):StackArray(maxSize) {}
 
@@ -32,6 +25,13 @@ public:
             free(arr[i]);
             arr[i] = NULL;
         }
+    }
+
+    void FreeItem(BinaryMessage * item) override {
+        if (item->data != NULL) {
+            free(item->data);
+        }
+        free(item);
     }
 
     BinaryMessage * UnshiftLast() {
