@@ -36,29 +36,39 @@ TEST(TimerTest, TimerTestRunStop)
 
 TEST(TimerTest, TimerTestOverflowMicros)
 {
-	timeOffset = ULONG_MAX - 500000ul;
+	timeOffset = 0;
+    timeOffset -= 10;
+
 	Timer::Loop();
 
 	TimerMock* timerMock = new TimerMock();
-	timerMock->Start(1000000ul);
+	TimerMock* timerMock2 = new TimerMock();
+	TimerMock* timerMock3 = new TimerMock();
+
+	timerMock->Start(8ul);
+	timerMock2->Start(10ul);
+	timerMock3->Start(15ul);
+
 	Timer::Loop();
 
-	timeOffset += 800000ul;
-
+	timeOffset += 8;
 	Timer::Loop();
-
-	EXPECT_FALSE(timerMock->IsCompleted());
-	//wchar_t message[128];
-	//swprintf(message, 128, L"Timer Overflow IsRunning Failed! now: %lu, Remain: %lu", micros(), timerMock->Remain());
-	//Assert::IsFalse(timerMock->IsCompleted(), message);
-
-	timeOffset += 200000ul;
-	Timer::Loop();
-
 	EXPECT_TRUE(timerMock->IsCompleted());
-	//swprintf(message, 128, L"Timer Overflow Complete Failed! now: %lu, Remain: %lu", micros(), timerMock->Remain());
-	//Assert::IsTrue(timerMock->IsCompleted(), message);
+	EXPECT_FALSE(timerMock2->IsCompleted());
+	EXPECT_FALSE(timerMock3->IsCompleted());
 
+
+	timeOffset += 4;
+	Timer::Loop();
+	EXPECT_TRUE(timerMock->IsCompleted());
+	EXPECT_TRUE(timerMock2->IsCompleted());
+	EXPECT_FALSE(timerMock3->IsCompleted());
+
+	timeOffset += 4;
+	Timer::Loop();
+	EXPECT_TRUE(timerMock->IsCompleted());
+	EXPECT_TRUE(timerMock2->IsCompleted());
+	EXPECT_TRUE(timerMock3->IsCompleted());
 
 	Timer::StopAll(timerMock);
 	timeOffset = 0;
