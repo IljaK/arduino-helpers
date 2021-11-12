@@ -32,6 +32,8 @@ TEST(TimerTest, TimerTestRunStop)
 	//swprintf(message, 128, L"Timer Complete Failed! now: %lu, Remain: %lu", micros(), timerMock->Remain());
 	//Assert::IsTrue(timerMock->IsCompleted(), message);
 
+    delete timerMock;
+
 }
 
 TEST(TimerTest, TimerTestOverflowMicros)
@@ -73,6 +75,10 @@ TEST(TimerTest, TimerTestOverflowMicros)
 	Timer::StopAll(timerMock);
 	timeOffset = 0;
 	TimerMock::Reset();
+
+    delete timerMock;
+    delete timerMock2;
+    delete timerMock3;
 }
 
 TEST(TimerTest, TimerFillTest)
