@@ -126,4 +126,6 @@ TEST(ByteStackArrayTest, ByteStackArrayTestOverflow)
 
 	EXPECT_EQ(byteStackArray.Size(), 0);
 
+    free(array);
+
 }

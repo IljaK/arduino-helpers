@@ -15,6 +15,11 @@ public:
         buffer = (uint8_t *)malloc(maxLength);
         length = 0;
     }
+    ~ByteArrayStream() {
+        length = 0;
+        free(buffer);
+    }
+
     int Available() {
         return length;
     }

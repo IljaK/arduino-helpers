@@ -41,4 +41,6 @@ TEST(ByteArrayStreamTest, ByteArrayStreamTestReadWrite)
         EXPECT_EQ(array[i], i);
     }
 	EXPECT_EQ(stream->Available(), 0);
+
+    delete stream;
 }
