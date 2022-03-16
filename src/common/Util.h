@@ -1,6 +1,10 @@
 #pragma once
 #include <Arduino.h>
 
+#if defined(ESP32)
+typedef void (*voidFuncPtr)(void);
+#endif
+
 #if defined(ESP32) || defined(ARDUINO_ARCH_SAMD)
 #define ANALOG_BITS_RESOLUTION 12 // 12 bits = 4096
 #define ANALOG_UNITS_RESOLUTION 4096
@@ -30,9 +34,10 @@ typedef void (*StringCallback)(char *, size_t);
 
 extern uint8_t reverseByte(uint8_t x);
 extern uint8_t getBitFromByte(uint8_t targetByte, uint8_t index);
+extern uint8_t setBitOfByte(uint8_t target, bool value, uint8_t index);
 
-extern uint8_t getBitsValue(uint8_t *target, uint8_t length, uint8_t start = 0);
-extern void setBitsValue(uint8_t *target, uint8_t value, uint8_t length, uint8_t start = 0);
+extern uint8_t getBitsValue(uint8_t *target, uint8_t length = 1, uint8_t start = 0);
+extern void setBitsValue(uint8_t *target, uint8_t value, uint8_t length = 1, uint8_t start = 0);
 extern uint16_t getBitsValue(uint16_t *target, uint8_t length, uint8_t start = 0);
 extern void setBitsValue(uint16_t* target, uint16_t value, uint8_t length, uint8_t start = 0);
 
@@ -50,7 +55,11 @@ extern void ShiftQuotations(char **subStrArray, size_t arraySize);
 
 extern uint32_t remainRam();
 extern double readAnalogVoltage(uint8_t pin);
+#if defined(ESP32)
+extern uint8_t initPullupPin(uint8_t pin, uint8_t mode, voidFuncPtr isrFunc);
+#else
 extern uint8_t initPullupPin(uint8_t pin, PinMode mode, voidFuncPtr isrFunc);
+#endif
 
 // outBuffer must be min size of: 2 * length + 1
 extern size_t encodeToHex(uint8_t *inArray, size_t length, char *outBuffer);

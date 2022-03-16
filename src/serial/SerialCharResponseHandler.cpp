@@ -22,7 +22,9 @@ void SerialCharResponseHandler::Loop()
 {
 	if (serial) {
         while (serial->available() > 0) {
-            if (LoadSymbolFromBuffer(serial->read())) {
+            int val = serial->read();
+            if (val == -1 || val == 0) break;
+            if (LoadSymbolFromBuffer(val)) {
                 return;
             }
         }
