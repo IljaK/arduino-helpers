@@ -23,6 +23,12 @@ uint8_t getBitFromByte(uint8_t targetByte, uint8_t index)
 	return (targetByte >> index) & 1;
 }
 
+uint8_t setBitOfByte(uint8_t target, bool value, uint8_t index)
+{
+    target ^= (-value ^ target) & (1UL << index);
+    return target;
+}
+
 uint8_t getBitsValue(uint8_t * target, uint8_t length, uint8_t start)
 {
 	uint8_t headerShift = (8u - start - length);
@@ -269,8 +275,11 @@ double readAnalogVoltage(uint8_t pin)
     double analog_value = analogRead(pin);
 	return ((analog_value * vcc) / ANALOG_UNITS_RESOLUTION_RANGE);
 }
-
+#if defined(ESP32)
+uint8_t initPullupPin(uint8_t pin, uint8_t mode, voidFuncPtr isrFunc)
+#else
 uint8_t initPullupPin(uint8_t pin, PinMode mode, voidFuncPtr isrFunc)
+#endif
 {
     pinMode(pin, INPUT);
     uint8_t val = digitalRead(pin);
