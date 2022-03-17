@@ -25,3 +25,4 @@ extern int32_t ZoneInSeconds(int8_t quaterZone);
 extern int16_t ZoneInMinutes(int8_t quaterZone);
 
 extern time_t ExtractTime(char *timeString, tmz * stamp);
+extern void PrintDateTime(Print *print, tm *stamp);
