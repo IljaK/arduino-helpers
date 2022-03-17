@@ -1,6 +1,6 @@
 #pragma once
+#include "Arduino.h"
 #include <time.h>
-#include <stdio.h>
 
 #ifndef ONE_HOUR
 #define ONE_HOUR 3600
@@ -12,6 +12,12 @@ constexpr uint32_t MICROS_IN_SECOND = 1000000ul;
 
 struct tmz: public tm
 {
+    int8_t quaterZone = 0;
+};
+
+struct timez_t
+{
+    time_t utcStamp = 0;
     int8_t quaterZone = 0;
 };
 
