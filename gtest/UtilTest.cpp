@@ -16,6 +16,19 @@ TEST(UtilTest, SplitArgumentsTest)
 	EXPECT_EQ(args, 3);
 }
 
+TEST(UtilTest, ShiftQuotationsTest)
+{
+	char data[] = "+CMT: \"+393475234652\",,\"14/11/21,11:58:23+01\"";
+    char *cmt = data + strlen("+CMT") + 2;
+    char *cmtArgs[3];
+    SplitString(cmt, ',', cmtArgs, 3, false);
+    ShiftQuotations(cmtArgs, 3);
+
+    EXPECT_TRUE(strcmp(cmtArgs[0], "+393475234652") == 0);
+    EXPECT_TRUE(strcmp(cmtArgs[1], "") == 0);
+    EXPECT_TRUE(strcmp(cmtArgs[2], "14/11/21,11:58:23+01") == 0);
+}
+
 TEST(UtilTest, Bit8ValueTest)
 {
 	uint8_t expect = 235; // 11101011

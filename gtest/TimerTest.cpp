@@ -9,30 +9,28 @@ TEST(TimerTest, TimerTestRunStop)
 	TimerMock::Reset();
 
 			
-	TimerMock * timerMock = new TimerMock();
+	TimerMock timerMock;
 
 	Timer::Loop();
-	timerMock->Start(1000000ul);
+	timerMock.Start(1000000ul);
 	Timer::Loop();
 
 	//wchar_t message[128];
-	//swprintf(message, 128, L"Timer IsRunning Failed! now: %lu, Remain: %lu", micros(), timerMock->Remain());
-	//Assert::IsFalse(timerMock->IsCompleted(), message);
-	EXPECT_FALSE(timerMock->IsCompleted());
+	//swprintf(message, 128, L"Timer IsRunning Failed! now: %lu, Remain: %lu", micros(), timerMock.Remain());
+	//Assert::IsFalse(timerMock.IsCompleted(), message);
+	EXPECT_FALSE(timerMock.IsCompleted());
 
 	timeOffset = 1000000ul;
 	Timer::Loop();
 
-	EXPECT_TRUE(timerMock->IsCompleted());
+	EXPECT_TRUE(timerMock.IsCompleted());
 
-	Timer::StopAll(timerMock);
+	Timer::StopAll(&timerMock);
 	timeOffset = 0;
 	TimerMock::Reset();
 
-	//swprintf(message, 128, L"Timer Complete Failed! now: %lu, Remain: %lu", micros(), timerMock->Remain());
-	//Assert::IsTrue(timerMock->IsCompleted(), message);
-
-    delete timerMock;
+	//swprintf(message, 128, L"Timer Complete Failed! now: %lu, Remain: %lu", micros(), timerMock.Remain());
+	//Assert::IsTrue(timerMock.IsCompleted(), message);
 
 }
 
@@ -43,42 +41,41 @@ TEST(TimerTest, TimerTestOverflowMicros)
 
 	Timer::Loop();
 
-	TimerMock* timerMock = new TimerMock();
-	TimerMock* timerMock2 = new TimerMock();
-	TimerMock* timerMock3 = new TimerMock();
+	TimerMock timerMock = TimerMock();
+	TimerMock timerMock2 = TimerMock();
+	TimerMock timerMock3 = TimerMock();
 
-	timerMock->Start(8ul);
-	timerMock2->Start(10ul);
-	timerMock3->Start(15ul);
+	timerMock.Start(8ul);
+	timerMock2.Start(10ul);
+	timerMock3.Start(15ul);
 
 	Timer::Loop();
 
 	timeOffset += 8;
 	Timer::Loop();
-	EXPECT_TRUE(timerMock->IsCompleted());
-	EXPECT_FALSE(timerMock2->IsCompleted());
-	EXPECT_FALSE(timerMock3->IsCompleted());
+	EXPECT_TRUE(timerMock.IsCompleted());
+	EXPECT_FALSE(timerMock2.IsCompleted());
+	EXPECT_FALSE(timerMock3.IsCompleted());
 
 
 	timeOffset += 4;
 	Timer::Loop();
-	EXPECT_TRUE(timerMock->IsCompleted());
-	EXPECT_TRUE(timerMock2->IsCompleted());
-	EXPECT_FALSE(timerMock3->IsCompleted());
+	EXPECT_TRUE(timerMock.IsCompleted());
+	EXPECT_TRUE(timerMock2.IsCompleted());
+	EXPECT_FALSE(timerMock3.IsCompleted());
 
 	timeOffset += 4;
 	Timer::Loop();
-	EXPECT_TRUE(timerMock->IsCompleted());
-	EXPECT_TRUE(timerMock2->IsCompleted());
-	EXPECT_TRUE(timerMock3->IsCompleted());
+	EXPECT_TRUE(timerMock.IsCompleted());
+	EXPECT_TRUE(timerMock2.IsCompleted());
+	EXPECT_TRUE(timerMock3.IsCompleted());
 
-	Timer::StopAll(timerMock);
+	Timer::StopAll(&timerMock);
+	Timer::StopAll(&timerMock2);
+	Timer::StopAll(&timerMock3);
+    
 	timeOffset = 0;
 	TimerMock::Reset();
-
-    delete timerMock;
-    delete timerMock2;
-    delete timerMock3;
 }
 
 TEST(TimerTest, TimerFillTest)
