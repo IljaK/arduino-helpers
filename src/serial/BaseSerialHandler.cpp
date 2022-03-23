@@ -45,7 +45,10 @@ void BaseSerialHandler::FlushData()
     // (Prior to Arduino 1.0, this instead removed any buffered incoming serial data.)
 	// serial->flush(); // Do not use this!
     while (serial->available()) {
-        serial->read();
+        int val = serial->read();
+        if (val <= 0) {
+            break;
+        }
     }
 }
 
