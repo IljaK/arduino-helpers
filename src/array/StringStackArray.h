@@ -1,3 +1,4 @@
+#pragma once
 #include "StackArray.h"
 
 class StringStackArray: public StackArray<char *>
@@ -48,5 +49,11 @@ public:
         }
 
         return pCopy;
+    }
+
+    void DeleteFirst() {
+        char *item = UnshiftFirst();
+        if (item == NULL) return;
+        FreeItem(item);
     }
 };

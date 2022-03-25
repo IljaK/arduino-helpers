@@ -64,6 +64,8 @@ void BaseSerialHandler::StartTimeoutTimer(unsigned long microSecTimeOut)
 }
 void BaseSerialHandler::StopTimeoutTimer()
 {
-	if (responseTimeoutTimer != 0) Timer::Stop(responseTimeoutTimer);
-	responseTimeoutTimer = 0;
+	if (responseTimeoutTimer != 0) {
+        Timer::Stop(responseTimeoutTimer);
+	    responseTimeoutTimer = 0;
+    }
 }
