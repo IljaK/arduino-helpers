@@ -337,12 +337,14 @@ char *makeNewCopy(char *target)
     if (target == NULL) {
         return NULL;
     }
-    char *result = (char*)malloc(strlen(target) + 1);
+    size_t len = strlen(target);
+    char *result = (char*)malloc(len + 1);
     if (result == NULL) {
         // No more memory
         return NULL;
     }
-    strcpy(result, target);
+    strncpy(result, target, len);
+    target[len] = 0;
     return result;
 }
 
