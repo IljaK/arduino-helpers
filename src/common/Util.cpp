@@ -344,7 +344,7 @@ char *makeNewCopy(char *target)
         return NULL;
     }
     strncpy(result, target, len);
-    target[len] = 0;
+    result[len] = 0;
     return result;
 }
 
