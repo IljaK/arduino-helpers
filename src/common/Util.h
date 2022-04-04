@@ -65,4 +65,4 @@ extern uint8_t initPullupPin(uint8_t pin, PinMode mode, voidFuncPtr isrFunc);
 extern size_t encodeToHex(uint8_t *inArray, size_t length, char *outBuffer);
 extern size_t decodeFromHex(char *inBuffer, uint8_t *outArray, size_t length);
 
-extern char *makeNewCopy(char *target);
+extern char *makeNewCopy(const char *target);

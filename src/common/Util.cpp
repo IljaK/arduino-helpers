@@ -332,7 +332,7 @@ size_t decodeFromHex(char *inBuffer, uint8_t *outArray, size_t bytesLen)
 }
 
 
-char *makeNewCopy(char *target)
+char *makeNewCopy(const char *target)
 {
     if (target == NULL) {
         return NULL;
