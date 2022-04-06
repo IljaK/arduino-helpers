@@ -63,7 +63,7 @@ bool SerialCharResponseHandler::LoadSymbolFromBuffer(uint8_t symbol)
 				return true;
 			}
 
-			// TODO: check if las symbol of buff + remain separator chars + new symbol match separator
+			// Сheck if las symbol of buff + remain separator chars + new symbol match separator
 			if (IsSeparatorRemainMatch(separatorMatchedLength - i - 1, symbol)) {
 				separatorMatchedLength = separatorMatchedLength - i;
 				return false;
