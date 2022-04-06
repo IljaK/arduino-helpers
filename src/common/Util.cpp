@@ -288,22 +288,25 @@ uint8_t initPullupPin(uint8_t pin, PinMode mode, voidFuncPtr isrFunc)
     return val;
 }
 
-inline uint8_t fromHexOctetToChar(uint8_t val) {
-    return (char)(val > 9 ? 'A' + val - 10 : '0' + val);
+inline uint8_t fromHexOctetToChar(uint8_t val, char a = 'A') {
+    return (char)(val > 9 ? a + val - 10 : '0' + val);
 }
 
-size_t encodeToHex(uint8_t *inArray, size_t length, char *outBuffer)
+size_t encodeToHex(uint8_t *inArray, size_t length, char *outBuffer, bool lowerCase)
 {
-    size_t wrote = 0;
+    char a = 'A';
+    if (lowerCase) {
+        a = 'a';
+    }
     for (size_t i = 0; i < length; i++) {
         uint8_t b = inArray[i];
-        outBuffer[0] = fromHexOctetToChar((b >> 4) & 0x0f);
-        outBuffer[1] = fromHexOctetToChar((b & 0x0f));
-        outBuffer[2] = 0;
+        outBuffer[0] = fromHexOctetToChar((b >> 4) & 0x0f, a);
+        outBuffer[1] = fromHexOctetToChar((b & 0x0f), a);
         outBuffer += 2;
-        wrote += 2;
     }
-    return wrote;
+    size_t result = length * 2;
+    outBuffer[result] = 0;
+    return result;
 }
 
 inline uint8_t fromCharToHexOctet(uint8_t val) {
