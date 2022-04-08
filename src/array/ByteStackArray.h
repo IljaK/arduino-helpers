@@ -15,9 +15,6 @@ private:
         size_t append = maxItemLength - item->length;
         if (append > length) append = length;
 
-        //Serial.print("AppendToItem: ");
-        //Serial.println(append);
-
         uint8_t * array = NULL;
         if (item->array == NULL) {
             array = (uint8_t *)malloc(append);
@@ -98,8 +95,6 @@ public:
         size_t remain = length;
         while (remain > 0) {
             size_t added = AppendInternal((uint8_t *)item + (length - remain), remain);
-            //Serial.print("Added:");
-            //Serial.println(added);
             if (added == 0) {
                 break;
             }

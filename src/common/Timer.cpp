@@ -236,23 +236,19 @@ bool Timer::Contains(ITimerCallback *pCaller, uint8_t data)
 
 uint8_t Timer::GetData(TimerID timerId)
 {
+    uint8_t data = 0;
 #if ESP32
 	xSemaphoreTakeRecursive( xTimerSemaphore, portMAX_DELAY );
 #endif
 	for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
 		if (pNode->id == timerId) {
-        #if ESP32
             uint8_t data = pNode->data;
-            xSemaphoreGiveRecursive(xTimerSemaphore);
-            return data;
-        #else
-            return pNode->data;
-        #endif
+            break;
 		}
 	}
 #if ESP32
     xSemaphoreGiveRecursive(xTimerSemaphore);
 #endif
 
-    return 0;
+    return data;
 }
