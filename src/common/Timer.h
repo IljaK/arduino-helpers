@@ -29,7 +29,7 @@ struct TimerNode
 class Timer
 {
 protected:
-#if ESP32
+#if defined(ESP32)
 	static SemaphoreHandle_t xTimerSemaphore;
 #endif
 	static TimerNode *pFirst;
