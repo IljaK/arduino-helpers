@@ -245,7 +245,7 @@ uint8_t Timer::GetData(TimerID timerId)
 #endif
 	for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
 		if (pNode->id == timerId) {
-            uint8_t data = pNode->data;
+            data = pNode->data;
             break;
 		}
 	}
