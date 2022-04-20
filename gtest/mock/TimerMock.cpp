@@ -66,9 +66,9 @@ void TimerMock::StopAll() {
 void TimerMock::PrintAll() {
     for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
         if (pNode->pNext == NULL) {
-            printf("%d\n", pNode->id);
+            printf("%zu\n", pNode->id);
         } else {
-            printf("%d ", pNode->id);
+            printf("%zu ", pNode->id);
         }
 	}
 }
