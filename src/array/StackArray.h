@@ -79,6 +79,15 @@ public:
     {
         return Unshift(0);
     }
+    virtual bool FreeFirst()
+    {
+        T item = Unshift(0);
+        if (item != NULL) {
+            FreeItem(item);
+            return true;
+        }
+        return false;
+    }
 
     virtual T Unshift(size_t index)
     {
