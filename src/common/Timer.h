@@ -20,22 +20,23 @@ struct TimerNode
 {
 	ITimerCallback *pCaller = NULL;
 	TimerID id = 0;
-    bool isProcessed = true;
 	unsigned long remain = 0;
 	uint8_t data = 0;
 	TimerNode *pNext = NULL;
+    bool skipIteration = false;
 };
 
 class Timer
 {
+private:
+    static TimerID processingId;
 protected:
 #if defined(ESP32)
 	static SemaphoreHandle_t xTimerSemaphore;
 #endif
 	static TimerNode *pFirst;
 	static unsigned long frameTS;
-    static void SetProcessed(bool value);
-    static bool LoopCompleted(unsigned long delta);
+    static void LoopCompleted(unsigned long delta);
 public:
 	static TimerID Start(ITimerCallback *pCaller, unsigned long duration, uint8_t data = 0);
 	static TimerID Start(timerCallBack completeCB, unsigned long duration, uint8_t data = 0, timerCallBack stopCB = NULL);

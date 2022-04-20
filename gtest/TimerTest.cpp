@@ -83,52 +83,70 @@ TEST(TimerTest, TimerFillTest)
 	timeOffset = 0;
 	TimerMock::Reset();
 
-	//int maxTimers = 1 + (rand() % MAXBYTE);
-	TimerMock timers[MAXBYTE];
+    const int timerCount = MAXBYTE;
+	TimerMock timers[timerCount];
 	//wchar_t message[128];
 
 	unsigned long maxVal = 0;
+    int maxSteps = 20;
 
 	// Fill timers
-	for (int i = 0; i < MAXBYTE; i++) {
+	for (int i = 0; i < timerCount; i++) {
 		unsigned long random = (unsigned long)rand() + 100ul;
 		if (maxVal < random) maxVal = random;
 		timers[i].Start(random);
 	}
 
+    //TimerMock::PrintAll();
+
 	// Iterate delta time
-	unsigned long delta = maxVal / 20;
-	for (unsigned long i = 0; i < 19; i++) {
-		timeOffset += delta;
+	unsigned long delta = maxVal / maxSteps;
+    unsigned long reminder = (maxVal - (unsigned long)maxSteps * delta);
+
+	for (int i = 0; i < maxSteps; i++) {
+        timeOffset += delta;
 		Timer::Loop();
 	}
 
+    if (reminder > 0) {
+        timeOffset += delta;
+		Timer::Loop();
+    }
+
+    //TimerMock::PrintAll();
+
+    Timer::Loop();
+
 	// Reset completed timers
-	for (int i = 0; i < MAXBYTE; i++) {
+	for (int i = 0; i < timerCount; i++) {
 		if (timers[i].IsCompleted()) {
 			timers[i].Start(maxVal);
 			EXPECT_EQ(i + 1, timers[i].TimerId());
+            EXPECT_FALSE(timers[i].IsCompleted());
 		}
 	}
 
 	// Check proper refill
-	for (int i = 0; i < MAXBYTE; i++) {
-		for (int n = i+1; n < MAXBYTE; n++) {
+	for (int i = 0; i < timerCount; i++) {
+		for (int n = i+1; n < timerCount; n++) {
 			EXPECT_NE(timers[n].TimerId(), timers[i].TimerId());
 		}
 	}
-
 
 	timeOffset += maxVal;
 	Timer::Loop();
 
 	// Check all completed
-	for (int i = 0; i < MAXBYTE; i++) {
+	for (int i = 0; i < timerCount; i++) {
 		EXPECT_TRUE(timers[i].IsCompleted());
 	}
 
-	for (int i = 0; i < MAXBYTE; i++) {
+	for (int i = 0; i < timerCount; i++) {
 		Timer::StopAll(&timers[i]);
+	}
+
+	for (int i = 0; i < timerCount; i++) {
+		EXPECT_TRUE(timers[i].IsCompleted());
 	}
 	timeOffset = 0;
 	TimerMock::Reset();
@@ -173,13 +191,39 @@ TEST(TimerTest, TimerStopAllOnCompleteTest)
 {
     timeOffset = 0;
 	TimerMock::Reset();
+	const uint8_t length = 10;
 
-    for (uint8_t i = 0; i < 10; i++) {
+    for (uint8_t i = 0; i < length; i++) {
         Timer::Start(onTimerComplete, (i + 1));
     }
 
-    for (uint8_t i = 0; i < 10; i++) {
+    for (uint8_t i = 0; i < length; i++) {
         timeOffset += 1;
         TimerMock::Loop();
     }
+}
+
+TimerID timerToStop = 0;
+void onTimerCompleteAndStop(TimerID timer, uint8_t data) {
+    if (timerToStop != 0) {
+        TimerMock::Stop(timerToStop);
+        timerToStop = 0;
+    }
+}
+
+TEST(TimerTest, TimerStopNextProcessed)
+{
+    timeOffset = 0;
+	TimerMock::Reset();
+
+    const int timerCount = 10;
+    TimerID timers[timerCount];
+
+    for (uint8_t i = 0; i < timerCount; i++) {
+        timers[i] = Timer::Start(onTimerCompleteAndStop, (i + 1));
+    }
+    timerToStop = timers[1];
+    timeOffset = 1;
+    Timer::Loop();
+
 }

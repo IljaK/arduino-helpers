@@ -48,8 +48,27 @@ void TimerMock::Reset()
 }
 
 void TimerMock::StopAll() {
-    while (pFirst != NULL)
-    {
-        Timer::Stop(pFirst->id);
-    }
+    ITimerCallback *pCaller = NULL;
+    TimerID id = 0;
+
+    for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
+        id = pNode->id;
+        pNode->id = 0;
+        pCaller = pNode->pCaller;
+        pNode->pCaller = NULL;
+        pNode->remain = 0;
+        if (pCaller != NULL) {
+            pCaller->OnTimerStop(id, pNode->data);
+        }
+	}
+}
+
+void TimerMock::PrintAll() {
+    for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
+        if (pNode->pNext == NULL) {
+            printf("%d\n", pNode->id);
+        } else {
+            printf("%d ", pNode->id);
+        }
+	}
 }

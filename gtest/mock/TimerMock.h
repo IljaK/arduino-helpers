@@ -20,5 +20,6 @@ public:
 
 	static void Reset();
     static void StopAll();
+    static void PrintAll();
 };
 

@@ -2,6 +2,7 @@
 
 TimerNode *Timer::pFirst = NULL;
 unsigned long Timer::frameTS = 0;
+TimerID Timer::processingId = 0;
 
 #if defined(ESP32)
 SemaphoreHandle_t Timer::xTimerSemaphore = xSemaphoreCreateRecursiveMutex();
@@ -24,30 +25,34 @@ TimerID Timer::Start(ITimerCallback *pCaller, unsigned long duration, uint8_t da
 	TimerNode *newNode = new TimerNode();
 	newNode->pCaller = pCaller;
 	newNode->remain = duration;
+    newNode->data = data;
 
-	if (pFirst == NULL || pFirst->id != 1u) {
+	if (pFirst == NULL) {
 		newNode->pNext = pFirst;
 		pFirst = newNode;
-        newNode->data = data;
 		newNode->id = 1u;
 	} else {
         TimerID maxID = -1;
+        TimerID latestId = 0;
 		for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext ) {
-            if (pNode->id == maxID) {
+            if (pNode->id != 0) {
+                latestId = pNode->id;
+            }
+            if (latestId == maxID) {
                 newNode->id = 0;
                 break;
             }
-			if (pNode->pNext == NULL || pNode->id + 1 < pNode->pNext->id) {
+			if (pNode->pNext == NULL || latestId + 1u < pNode->pNext->id) {
 				newNode->pNext = pNode->pNext;
 				pNode->pNext = newNode;
-				newNode->id = pNode->id + 1u;
-				newNode->data = data;
+				newNode->id = latestId + 1u;
 				break;
 			}
 		}
 	}
 
 	TimerID id = newNode->id;
+    newNode->skipIteration = processingId != 0 && id >= processingId;
     if (id == 0) {
         delete newNode;
     }
@@ -78,87 +83,87 @@ void Timer::Loop()
 
 	unsigned long microsTS = micros();
 	unsigned long delta = microsTS - frameTS;
-    if (delta > 0) {
-        frameTS = microsTS;
-        SetProcessed(false);
-        while(LoopCompleted(delta)) {
-            // Do nothing, just loop
-        }
-    }
+    frameTS = microsTS;
+    LoopCompleted(delta);
 #if defined(ESP32)
     TIMER_MUTEX_UNLOCK();
 #endif
 }
 
-
-void Timer::SetProcessed(bool value)
+void Timer::LoopCompleted(unsigned long delta)
 {
-    for (TimerNode* pNode = pFirst; pNode; pNode = pNode->pNext) {
-        pNode->isProcessed = value;
-    }
-}
+    if (pFirst == NULL) return;
+    
+    TimerNode *pPrev = NULL;
+    TimerNode *delNode = NULL;
 
-bool Timer::LoopCompleted(unsigned long delta)
-{
-	TimerNode *pPrev = NULL;
+    processingId = 1;
 
-	for (TimerNode* pNode = pFirst; pNode; pPrev = pNode, pNode = pNode->pNext) {
+	for (TimerNode* pNode = pFirst; pNode; ) {
 
-		if (pNode->isProcessed) continue;
-        
-		if (pNode->remain <= delta) {
+        if (pNode->id != 0) {
+            processingId = pNode->id;
+        }
+
+        if (pNode->skipIteration) {
+            pNode->skipIteration = false;
+            pPrev = pNode;
+            pNode = pNode->pNext;
+            continue;
+        }
+
+		if (pNode->remain <= delta || pNode->id == 0) {
 			if (pPrev == NULL) {
 				pFirst = pNode->pNext;
 			} else {
 				pPrev->pNext = pNode->pNext;
 			}
-			pNode->remain = 0;
-			pNode->pNext = NULL;
+            delNode = pNode;
+            pNode = pNode->pNext;
+			delNode->pNext = NULL;
+			delNode->remain = 0;
             
-			pNode->pCaller->OnTimerComplete(pNode->id, pNode->data);
-			delete pNode;
-			return true;
-		} else {
-            pNode->remain -= delta;
-            pNode->isProcessed = true;
-        }
+            if (delNode->id != 0 && delNode->pCaller != NULL) {
+			    delNode->pCaller->OnTimerComplete(delNode->id, delNode->data);
+            }
+			delete delNode;
+            continue;
+		}
+        pNode->remain -= delta;
+        pPrev = pNode;
+        pNode = pNode->pNext;
 	}
-    return false;
+
+    processingId = 0;
 }
 
 bool Timer::Stop(TimerID timerId)
 {
 	if (timerId == 0) return false;
 
+	bool result = false;
+    ITimerCallback *pCaller = NULL;
+
 #if defined(ESP32)
 	TIMER_MUTEX_LOCK();
 #endif
-	bool result = false;
-
-	TimerNode *pPrev = NULL;
 	for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
-
 		if (pNode->id == timerId) {
-			if (pNode == pFirst) {
-				pFirst = pNode->pNext;
-				pPrev = NULL;
-			} else {
-				pPrev->pNext = pNode->pNext;
-			}
-            if (pNode->pCaller) {
-                pNode->pCaller->OnTimerStop(pNode->id, pNode->data);
+            pNode->id = 0;
+            pCaller = pNode->pCaller;
+            pNode->pCaller = NULL;
+            pNode->remain = 0;
+            if (pCaller != NULL) {
+                pCaller->OnTimerStop(timerId, pNode->data);
             }
-			delete pNode;
-			result = true;
+            result = true;
 			break;
 		}
-		pPrev = pNode;
 	}
-
 #if defined(ESP32)
     TIMER_MUTEX_UNLOCK();
 #endif
-	return result;
+    return result;
 }
 
 
@@ -168,30 +173,19 @@ void Timer::StopAll(ITimerCallback* pCaller)
 #if defined(ESP32)
 	TIMER_MUTEX_LOCK();
 #endif
-	TimerNode* pPrev = NULL;
-
-	for (TimerNode* pNode = pFirst; pNode; ) {
-
+    TimerID timerId = 0;
+	for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
 		if (pNode->pCaller == pCaller) {
-			TimerNode* freeNode = pNode;
-			pNode = pNode->pNext;
-
-			if (freeNode == pFirst) {
-				pFirst = freeNode->pNext;
-				pPrev = NULL;
-			}
-			else {
-				pPrev->pNext = freeNode->pNext;
-			}
-
-            if (freeNode != NULL && freeNode->pCaller) {
-                freeNode->pCaller->OnTimerStop(freeNode->id, freeNode->data);
+            timerId = pNode->id;
+			pNode->id = 0;
+            pCaller = pNode->pCaller;
+            pNode->pCaller = NULL;
+            pNode->remain = 0;
+            if (pCaller != NULL) {
+                pCaller->OnTimerStop(timerId, pNode->data);
             }
-			delete freeNode;
 			continue;
 		}
-		pPrev = pNode;
-		pNode = pNode->pNext;
 	}
 #if defined(ESP32)
     TIMER_MUTEX_UNLOCK();
