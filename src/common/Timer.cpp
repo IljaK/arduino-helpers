@@ -2,7 +2,7 @@
 
 TimerNode *Timer::pFirst = NULL;
 unsigned long Timer::frameTS = 0;
-TimerID Timer::processingId = 0;
+TimerNode *Timer::processingNode = NULL;
 
 #if defined(ESP32)
 SemaphoreHandle_t Timer::xTimerSemaphore = xSemaphoreCreateRecursiveMutex();
@@ -26,6 +26,7 @@ TimerID Timer::Start(ITimerCallback *pCaller, unsigned long duration, uint8_t da
 	newNode->pCaller = pCaller;
 	newNode->remain = duration;
     newNode->data = data;
+    newNode->skipIteration = false;
 
 	if (pFirst == NULL) {
 		newNode->pNext = pFirst;
@@ -34,7 +35,12 @@ TimerID Timer::Start(ITimerCallback *pCaller, unsigned long duration, uint8_t da
 	} else {
         TimerID maxID = -1;
         TimerID latestId = 0;
+        bool skipIteration = false;
 		for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext ) {
+
+            skipIteration = skipIteration || pNode == processingNode;
+            newNode->skipIteration = skipIteration;
+
             if (pNode->id != 0) {
                 latestId = pNode->id;
             }
@@ -52,7 +58,6 @@ TimerID Timer::Start(ITimerCallback *pCaller, unsigned long duration, uint8_t da
 	}
 
 	TimerID id = newNode->id;
-    newNode->skipIteration = processingId != 0 && id >= processingId;
     if (id == 0) {
         delete newNode;
     }
@@ -97,29 +102,28 @@ void Timer::LoopCompleted(unsigned long delta)
     TimerNode *pPrev = NULL;
     TimerNode *delNode = NULL;
 
-    processingId = 1;
+	for (processingNode = pFirst; processingNode; ) {
 
-	for (TimerNode* pNode = pFirst; pNode; ) {
-
-        if (pNode->id != 0) {
-            processingId = pNode->id;
-        }
-
-        if (pNode->skipIteration) {
-            pNode->skipIteration = false;
-            pPrev = pNode;
-            pNode = pNode->pNext;
+        if (processingNode->skipIteration) {
+            processingNode->skipIteration = false;
+            pPrev = processingNode;
+            processingNode = processingNode->pNext;
             continue;
         }
+        if (processingNode->remain <= delta) {
+            processingNode->remain = 0;
+        } else {
+            processingNode->remain -= delta;
+        }
 
-		if (pNode->remain <= delta || pNode->id == 0) {
+		if (processingNode->remain == 0 || processingNode->id == 0) {
 			if (pPrev == NULL) {
-				pFirst = pNode->pNext;
+				pFirst = processingNode->pNext;
 			} else {
-				pPrev->pNext = pNode->pNext;
+				pPrev->pNext = processingNode->pNext;
 			}
-            delNode = pNode;
-            pNode = pNode->pNext;
+            delNode = processingNode;
+            processingNode = processingNode->pNext;
 			delNode->pNext = NULL;
 			delNode->remain = 0;
             
@@ -129,12 +133,9 @@ void Timer::LoopCompleted(unsigned long delta)
 			delete delNode;
             continue;
 		}
-        pNode->remain -= delta;
-        pPrev = pNode;
-        pNode = pNode->pNext;
+        pPrev = processingNode;
+        processingNode = processingNode->pNext;
 	}
-
-    processingId = 0;
 }
 
 bool Timer::Stop(TimerID timerId)

@@ -29,7 +29,7 @@ struct TimerNode
 class Timer
 {
 private:
-    static TimerID processingId;
+    static TimerNode *processingNode;
 protected:
 #if defined(ESP32)
 	static SemaphoreHandle_t xTimerSemaphore;

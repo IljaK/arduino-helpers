@@ -54,10 +54,10 @@ void TimerMock::StopAll() {
     for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
         id = pNode->id;
         pNode->id = 0;
-        pCaller = pNode->pCaller;
-        pNode->pCaller = NULL;
         pNode->remain = 0;
-        if (pCaller != NULL) {
+        if (pNode->pCaller != NULL) {
+            pCaller = pNode->pCaller;
+            pNode->pCaller = NULL;
             pCaller->OnTimerStop(id, pNode->data);
         }
 	}
