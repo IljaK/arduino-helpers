@@ -36,10 +36,23 @@ TimerID Timer::Start(ITimerCallback *pCaller, unsigned long duration, uint8_t da
         TimerID maxID = -1;
         TimerID latestId = 0;
         bool skipIteration = false;
-		for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext ) {
 
-            skipIteration = skipIteration || pNode == processingNode;
+        TimerNode *pPrev = NULL;
+		for (TimerNode *pNode = pFirst; pNode; pPrev = pNode, pNode = pNode->pNext ) {
+
+            skipIteration = processingNode != NULL && (skipIteration || pPrev == processingNode);
             newNode->skipIteration = skipIteration;
+
+			if (latestId + 1u < pNode->id) {
+                if (pPrev == NULL) {
+                    pFirst = newNode;
+                } else {
+                    pPrev->pNext = newNode;
+                }
+				newNode->pNext = pNode;
+				newNode->id = latestId + 1u;
+				break;
+			}
 
             if (pNode->id != 0) {
                 latestId = pNode->id;
@@ -48,12 +61,13 @@ TimerID Timer::Start(ITimerCallback *pCaller, unsigned long duration, uint8_t da
                 newNode->id = 0;
                 break;
             }
-			if (pNode->pNext == NULL || latestId + 1u < pNode->pNext->id) {
-				newNode->pNext = pNode->pNext;
-				pNode->pNext = newNode;
+
+            if (pNode->pNext == NULL) {
+                pNode->pNext = newNode;
 				newNode->id = latestId + 1u;
-				break;
-			}
+                break;
+            }
+            
 		}
 	}
 
@@ -176,10 +190,12 @@ void Timer::StopAll(ITimerCallback* pCaller)
 #endif
     TimerID timerId = 0;
 	for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
+        if (pNode->id == 0) {
+            continue;
+        }
 		if (pNode->pCaller == pCaller) {
             timerId = pNode->id;
 			pNode->id = 0;
-            pCaller = pNode->pCaller;
             pNode->pCaller = NULL;
             pNode->remain = 0;
             if (pCaller != NULL) {

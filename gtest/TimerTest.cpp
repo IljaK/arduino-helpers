@@ -109,13 +109,14 @@ TEST(TimerTest, TimerFillTest)
 	}
 
     if (reminder > 0) {
-        timeOffset += delta;
+        timeOffset += reminder;
 		Timer::Loop();
     }
 
     //TimerMock::PrintAll();
 
     Timer::Loop();
+    EXPECT_EQ(TimerMock::GetCount(), 0);
 
 	// Reset completed timers
 	for (int i = 0; i < timerCount; i++) {
@@ -161,24 +162,79 @@ TEST(TimerTest, TimerAddOnCallbackTest)
 	TimerMock timers[length];
 
 	for (int i = 0; i < length; i++) {
-		timers[i].Start(1);
+		timers[i].Start(length - i);
 		timers[i].resetOnComplete = true;
+        timers[i].duration = length;
 	}
 
-	timeOffset += 1;
-	Timer::Loop();
+    EXPECT_EQ(TimerMock::GetCount(), length);
+    EXPECT_FALSE(TimerMock::HasDuplicateID());
+
+    for (int i = 0; i < length; i++) {
+        timeOffset += 1;
+        Timer::Loop();
+        EXPECT_EQ(TimerMock::GetCount(), length);
+    }
+
+    EXPECT_FALSE(TimerMock::HasDuplicateID());
+    EXPECT_EQ(TimerMock::GetCount(), length);
 
 	for (int i = 0; i < length; i++) {
 		EXPECT_FALSE(timers[i].IsCompleted());
 		timers[i].resetOnComplete = false;
 	}
 
-	timeOffset += 1;
+    EXPECT_FALSE(TimerMock::HasDuplicateID());
+    EXPECT_EQ(TimerMock::GetCount(), length);
+
+	timeOffset += 3;
 	Timer::Loop();
 
 	for (int i = 0; i < length; i++) {
 		EXPECT_TRUE(timers[i].IsCompleted());
 	}
+
+    EXPECT_EQ(TimerMock::GetCount(), 0);
+
+    for (int i = 0; i < length; i++) {
+        timers[i].Start(length);
+		timers[i].resetOnComplete = false;
+		timers[i].resetOnStop = true;
+    }
+
+    for (int i = 0; i < length; i++) {
+        timers[i].Stop();
+		timers[i].resetOnComplete = false;
+		timers[i].resetOnStop = false;
+    }
+
+    EXPECT_FALSE(TimerMock::HasDuplicateID());
+    EXPECT_EQ(TimerMock::GetCount(), length);
+
+	Timer::Loop();
+
+    EXPECT_FALSE(TimerMock::HasDuplicateID());
+    EXPECT_EQ(TimerMock::GetCount(), length);
+
+    for (int i = 0; i < length; i++) {
+        timers[i].Start(length);
+    }
+
+    // Timers will reset
+    for (int i = length - 1; i >= 0; i--) {
+		timers[i].resetOnStop = true;
+        // Will stop and start new one
+        timers[i].Stop();
+		timers[i].resetOnStop = false;
+        timers[i].Stop();
+    }
+
+    EXPECT_FALSE(TimerMock::HasDuplicateID());
+
+    Timer::Loop();
+    EXPECT_EQ(TimerMock::GetCount(), 0);
+
+
 	timeOffset = 0;
 	TimerMock::Reset();
 }
@@ -206,7 +262,7 @@ TEST(TimerTest, TimerStopAllOnCompleteTest)
 TimerID timerToStop = 0;
 void onTimerCompleteAndStop(TimerID timer, uint8_t data) {
     if (timerToStop != 0) {
-        TimerMock::Stop(timerToStop);
+        Timer::Stop(timerToStop);
         timerToStop = 0;
     }
 }
@@ -225,5 +281,98 @@ TEST(TimerTest, TimerStopNextProcessed)
     timerToStop = timers[1];
     timeOffset = 1;
     Timer::Loop();
+}
 
+void onTimerDoNothing(TimerID timer, uint8_t data) {
+    
+}
+TEST(TimerTest, TimerStopInstance)
+{
+    timeOffset = 0;
+	TimerMock::Reset();
+
+    TimerID id = Timer::Start(&onTimerDoNothing, 1);
+    EXPECT_TRUE(Timer::Stop(id));
+
+    Timer::TimerCallback *cb = new Timer::TimerCallback(&onTimerDoNothing);
+    TimerID id1 = Timer::Start(cb, 1);
+    TimerID id2 = Timer::Start(cb, 1);
+
+    delete cb;
+
+    TimerMock::Loop();
+
+    EXPECT_EQ(TimerMock::GetCount(), 0);
+}
+
+void onTimerStartNew(TimerID timer, uint8_t data) {
+    Timer::Start(&onTimerDoNothing, 1);
+}
+TEST(TimerTest, TimerOrder)
+{
+    timeOffset = 0;
+	TimerMock::Reset();
+
+    TimerID id[3];
+
+    id[0] = Timer::Start(&onTimerDoNothing, 10);
+    id[1] = Timer::Start(&onTimerDoNothing, 1);
+    id[2] = Timer::Start(&onTimerDoNothing, 10);
+
+    Timer::Stop(id[1]);
+    id[1] = Timer::Start(&onTimerDoNothing, 1, 0, &onTimerStartNew);
+    Timer::Stop(id[1]);
+
+    id[1] = Timer::Start(&onTimerStartNew, 1);
+    timeOffset += 1;
+    Timer::Loop();
+
+    EXPECT_EQ(TimerMock::GetCount(), 3);
+}
+
+TEST(TimerTest, TimerAddRemoveTest)
+{
+    timeOffset = 0;
+	TimerMock::Reset();
+
+    TimerID id[3];
+
+    id[0] = Timer::Start(&onTimerDoNothing, 1);
+    id[1] = Timer::Start(&onTimerDoNothing, 1);
+    id[2] = Timer::Start(&onTimerDoNothing, 1);
+    EXPECT_EQ(TimerMock::GetCount(), 3);
+    EXPECT_FALSE(TimerMock::HasDuplicateID());
+
+    Timer::Stop(id[0]);
+    EXPECT_FALSE(TimerMock::HasDuplicateID());
+    EXPECT_EQ(TimerMock::GetCount(), 2);
+    Timer::Loop();
+    EXPECT_FALSE(TimerMock::HasDuplicateID());
+    id[0] = Timer::Start(&onTimerDoNothing, 1);
+    EXPECT_EQ(TimerMock::GetCount(), 3);
+
+    Timer::Loop();
+    EXPECT_FALSE(TimerMock::HasDuplicateID());
+
+    Timer::Stop(id[1]);
+    EXPECT_FALSE(TimerMock::HasDuplicateID());
+    EXPECT_EQ(TimerMock::GetCount(), 2);
+    Timer::Loop();
+    EXPECT_FALSE(TimerMock::HasDuplicateID());
+    id[1] = Timer::Start(&onTimerDoNothing, 1);
+    EXPECT_FALSE(TimerMock::HasDuplicateID());
+    EXPECT_EQ(TimerMock::GetCount(), 3);
+
+    Timer::Loop();
+    EXPECT_FALSE(TimerMock::HasDuplicateID());
+
+    Timer::Stop(id[2]);
+    EXPECT_FALSE(TimerMock::HasDuplicateID());
+    EXPECT_EQ(TimerMock::GetCount(), 2);
+    Timer::Loop();
+    EXPECT_FALSE(TimerMock::HasDuplicateID());
+    id[2] = Timer::Start(&onTimerDoNothing, 1);
+    EXPECT_FALSE(TimerMock::HasDuplicateID());
+    EXPECT_EQ(TimerMock::GetCount(), 3);
+    
 }

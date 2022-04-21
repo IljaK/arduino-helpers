@@ -23,6 +23,9 @@ void TimerMock::OnTimerComplete(TimerID timerId, uint8_t data) {
 void TimerMock::OnTimerStop(TimerID timerId, uint8_t data) {
     if (timerId == this->timerId) {
 		this->timerId = 0;
+        if (resetOnStop) {
+			this->timerId = Timer::Start(this, duration, data);
+		}
     }
 }
 
@@ -32,10 +35,14 @@ bool TimerMock::IsCompleted() {
 void TimerMock::Start(unsigned long duration) {
 	if (timerId != 0) {
 		Timer::Stop(timerId);
-		timerId = 0;
 	}
 	this->duration = duration;
 	timerId = Timer::Start(this, duration);
+}
+void TimerMock::Stop() {
+	if (timerId != 0) {
+		Timer::Stop(timerId);
+	}
 }
 unsigned long TimerMock::Remain()
 {
@@ -45,6 +52,8 @@ unsigned long TimerMock::Remain()
 void TimerMock::Reset()
 {
 	frameTS = 0;
+    StopAll();
+    Loop();
 }
 
 void TimerMock::StopAll() {
@@ -71,4 +80,35 @@ void TimerMock::PrintAll() {
             printf("%zu ", pNode->id);
         }
 	}
+}
+
+uint32_t TimerMock::GetAllCount() {
+    uint32_t count = 0;
+    for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
+        count++;
+	}
+    return count;
+}
+uint32_t TimerMock::GetCount() {
+    uint32_t count = 0;
+    for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
+        if (pNode->id == 0) continue;
+        count++;
+	}
+    return count;
+}
+bool TimerMock::HasDuplicateID()
+{
+    if (pFirst == NULL || pFirst->pNext == NULL) {
+        return false;
+    }
+    for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
+        if (pNode->id == 0) continue;
+        for (TimerNode *pNode2 = pFirst; pNode2; pNode2 = pNode2->pNext) {
+            if (pNode != pNode2 && pNode->id == pNode2->id) {
+                return true;
+            }
+	    }
+	}
+    return false;
 }
