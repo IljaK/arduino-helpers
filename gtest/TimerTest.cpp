@@ -319,9 +319,16 @@ TEST(TimerTest, TimerOrder)
     id[1] = Timer::Start(&onTimerDoNothing, 1);
     id[2] = Timer::Start(&onTimerDoNothing, 10);
 
+    EXPECT_EQ(TimerMock::GetCount(), 3);
+
     Timer::Stop(id[1]);
+
+    EXPECT_EQ(TimerMock::GetCount(), 2);
+
     id[1] = Timer::Start(&onTimerDoNothing, 1, 0, &onTimerStartNew);
     Timer::Stop(id[1]);
+
+    EXPECT_EQ(TimerMock::GetCount(), 3);
 
     id[1] = Timer::Start(&onTimerStartNew, 1);
     timeOffset += 1;
@@ -340,6 +347,7 @@ TEST(TimerTest, TimerAddRemoveTest)
     id[0] = Timer::Start(&onTimerDoNothing, 1);
     id[1] = Timer::Start(&onTimerDoNothing, 1);
     id[2] = Timer::Start(&onTimerDoNothing, 1);
+
     EXPECT_EQ(TimerMock::GetCount(), 3);
     EXPECT_FALSE(TimerMock::HasDuplicateID());
 
@@ -375,4 +383,56 @@ TEST(TimerTest, TimerAddRemoveTest)
     EXPECT_FALSE(TimerMock::HasDuplicateID());
     EXPECT_EQ(TimerMock::GetCount(), 3);
     
+
+    TimerMock::StopAll();
+    Timer::Loop();
+
+    /*
+[1 3 0 4 5 0 6 7]
+09:50:07.009 > N 1
+09:50:07.020 > -3
+09:50:07.030 > -4
+09:50:07.040 > -5
+09:50:07.050 > [6 7]
+    */
+
+    TimerMock timers[8];
+
+    timers[0].Start(1);
+    timers[1].Start(2);
+    timers[2].Start(4); // 0
+    timers[3].Start(2);
+    timers[4].Start(2);
+    timers[5].Start(4); // 0
+    timers[6].Start(4);
+    timers[7].Start(4);
+
+    timeOffset += 1;
+    Timer::Loop();
+    timers[0].Start(2);
+
+    timers[2].Stop();
+    timers[5].Stop();
+
+    TimerMock::PrintAll();
+
+    EXPECT_EQ(TimerMock::GetCount(), 6);
+    EXPECT_EQ(TimerMock::GetAllCount(), 8);
+
+    timeOffset += 1;
+    Timer::Loop();
+
+    TimerMock::PrintAll();
+
+    EXPECT_EQ(TimerMock::GetCount(), 3);
+
+    EXPECT_FALSE(timers[0].IsCompleted());
+    EXPECT_TRUE(timers[1].IsCompleted());
+    EXPECT_TRUE(timers[2].IsCompleted());
+    EXPECT_TRUE(timers[3].IsCompleted());
+    EXPECT_TRUE(timers[4].IsCompleted());
+    EXPECT_TRUE(timers[5].IsCompleted());
+    EXPECT_FALSE(timers[6].IsCompleted());
+    EXPECT_FALSE(timers[7].IsCompleted());
+
 }

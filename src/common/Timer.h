@@ -18,25 +18,42 @@ typedef void (*timerCallBack) (TimerID timerId, uint8_t data);
 
 struct TimerNode
 {
-	ITimerCallback *pCaller = NULL;
+    TimerNode(ITimerCallback *pCaller, unsigned long duration, uint8_t data) {
+        this->pCaller = pCaller;
+        this->startStamp = micros();
+        this->endStamp = micros() + duration;
+        this->data = data;
+    }
+	ITimerCallback *pCaller;
+	unsigned long startStamp;
+	unsigned long endStamp;
+	uint8_t data;
 	TimerID id = 0;
-	unsigned long remain = 0;
-	uint8_t data = 0;
 	TimerNode *pNext = NULL;
-    bool skipIteration = false;
+    bool IsCompleted() {
+        unsigned long stamp = micros();
+        return micros() - startStamp >= endStamp - startStamp;
+    }
+    bool IsStopped() {
+        return id == 0;
+    }
+
+    unsigned long Remain() {
+        if (id == 0 || IsCompleted()) return 0;
+        return endStamp - (micros() - startStamp);
+    }
+
 };
 
 class Timer
 {
-private:
-    static TimerNode *processingNode;
 protected:
 #if defined(ESP32)
 	static SemaphoreHandle_t xTimerSemaphore;
 #endif
 	static TimerNode *pFirst;
 	static unsigned long frameTS;
-    static void LoopCompleted(unsigned long delta);
+    static void LoopCompleted();
 public:
 	static TimerID Start(ITimerCallback *pCaller, unsigned long duration, uint8_t data = 0);
 	static TimerID Start(timerCallBack completeCB, unsigned long duration, uint8_t data = 0, timerCallBack stopCB = NULL);

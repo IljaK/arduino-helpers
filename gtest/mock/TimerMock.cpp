@@ -2,6 +2,7 @@
 
 TimerMock::TimerMock()
 {
+    
 }
 
 TimerMock::~TimerMock()
@@ -57,17 +58,15 @@ void TimerMock::Reset()
 }
 
 void TimerMock::StopAll() {
-    ITimerCallback *pCaller = NULL;
     TimerID id = 0;
 
     for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
+        if (pNode->id == 0) continue;
         id = pNode->id;
         pNode->id = 0;
-        pNode->remain = 0;
         if (pNode->pCaller != NULL) {
-            pCaller = pNode->pCaller;
+            pNode->pCaller->OnTimerStop(id, pNode->data);
             pNode->pCaller = NULL;
-            pCaller->OnTimerStop(id, pNode->data);
         }
 	}
 }
