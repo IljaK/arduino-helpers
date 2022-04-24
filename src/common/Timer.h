@@ -31,7 +31,6 @@ struct TimerNode
 	TimerID id = 0;
 	TimerNode *pNext = NULL;
     bool IsCompleted() {
-        unsigned long stamp = micros();
         return micros() - startStamp >= endStamp - startStamp;
     }
     bool IsStopped() {
