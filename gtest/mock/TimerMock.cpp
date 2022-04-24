@@ -52,7 +52,6 @@ unsigned long TimerMock::Remain()
 }
 void TimerMock::Reset()
 {
-	frameTS = 0;
     StopAll();
     Loop();
 }

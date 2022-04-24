@@ -52,8 +52,10 @@ protected:
 	static SemaphoreHandle_t xTimerSemaphore;
 #endif
 	static TimerNode *pFirst;
-	static unsigned long frameTS;
+	static TimerNode *pProcessing;
+	static TimerNode *pProcessingPrev;
     static void LoopCompleted();
+    static TimerID AddNode(ITimerCallback *pCaller, unsigned long duration, uint8_t data);
 public:
 	static TimerID Start(ITimerCallback *pCaller, unsigned long duration, uint8_t data = 0);
 	static TimerID Start(timerCallBack completeCB, unsigned long duration, uint8_t data = 0, timerCallBack stopCB = NULL);
