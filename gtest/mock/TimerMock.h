@@ -3,12 +3,12 @@
 
 class TimerMock: public Timer, public ITimerCallback
 {
-private:
-	TimerID timerId = 0;
 public:
+	TimerID timerId = 0;
 	unsigned long duration = 0;
 	bool resetOnComplete = false;
 	bool resetOnStop = false;
+    TimerID stopTimerOnComplete = 0;
 
 	TimerMock();
 	~TimerMock();

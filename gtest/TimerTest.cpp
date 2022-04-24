@@ -390,10 +390,33 @@ TEST(TimerTest, TimerAddRemoveTest)
 
     timers[4].Start(10);
     timers[4].resetOnComplete = true;
-    
+
     timeOffset = 1;
     Timer::Loop();
 
     ASSERT_EQ(TimerMock::GetCount(), count);
+
+    timeOffset = 0;
+	TimerMock::Reset();
+
+    ASSERT_EQ(TimerMock::GetCount(), 0);
+
+    timers[0].Start(2);
+    timers[0].resetOnComplete = false;
+
+    timers[1].Start(2);
+    timers[1].resetOnStop = true;
+
+    timers[2].Start(1);
+    timers[2].resetOnComplete = false;
+    timers[2].stopTimerOnComplete = timers[1].timerId;
+
+    timers[3].Start(2);
+    timers[3].resetOnComplete = false;
+
+    timeOffset = 1;
+    Timer::Loop();
+
+    ASSERT_EQ(TimerMock::GetCount(), 3);
 
 }

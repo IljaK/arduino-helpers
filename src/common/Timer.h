@@ -20,26 +20,37 @@ struct TimerNode
 {
     TimerNode(ITimerCallback *pCaller, unsigned long duration, uint8_t data) {
         this->pCaller = pCaller;
-        this->startStamp = micros();
-        this->endStamp = micros() + duration;
+        this->remain = duration;
         this->data = data;
+        this->updateStamp = micros();
     }
 	ITimerCallback *pCaller;
-	unsigned long startStamp;
-	unsigned long endStamp;
+	unsigned long remain;
+	unsigned long updateStamp;
 	uint8_t data;
 	TimerID id = 0;
 	TimerNode *pNext = NULL;
+
     bool IsCompleted() {
-        return micros() - startStamp >= endStamp - startStamp;
+        if (remain == 0) return true;
+
+        unsigned long delta = micros() - this->updateStamp;
+        this->updateStamp += delta;
+
+        if (remain < delta) {
+            remain = 0;
+        } else {
+            remain -= delta;
+        }
+        return (remain == 0);
     }
+
     bool IsStopped() {
         return id == 0;
     }
 
     unsigned long Remain() {
-        if (id == 0 || IsCompleted()) return 0;
-        return endStamp - (micros() - startStamp);
+        return remain;
     }
 
 };
