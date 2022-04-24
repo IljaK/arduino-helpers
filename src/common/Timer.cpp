@@ -55,7 +55,6 @@ TimerID Timer::AddNode(ITimerCallback *pCaller, unsigned long duration, uint8_t 
 
     TimerID maxID = -1;
     TimerID nextId = 1u;
-    bool skipIteration = false;
 
     TimerNode *pPrev = NULL;
     for (TimerNode *pNode = pFirst; pNode; pPrev = pNode, pNode = pNode->pNext ) {
