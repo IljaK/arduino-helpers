@@ -305,7 +305,8 @@ size_t encodeToHex(uint8_t *inArray, size_t length, char *outBuffer, bool lowerC
         outBuffer += 2;
     }
     size_t result = length * 2;
-    outBuffer[result] = 0;
+    // outBuffer is shifted by (length - 1) * 2
+    outBuffer[0] = 0;
     return result;
 }
 
