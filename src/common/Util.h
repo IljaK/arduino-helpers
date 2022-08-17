@@ -21,8 +21,6 @@ constexpr uint8_t ESC_ASCII_SYMBOL = 27u; // ESC
 //constexpr uint32_t baudRates[] = { 1200, 2400, 4800, 9600, 14400, 19200, 28800, 57600, 115200 };
 //temp|out temp|humidity|pressure|voltage|ampers|calculated voltage
 
-extern void(* rebootDeviceFunc) (void);
-
 struct DeviceSpecData {
     uint32_t remainRam = 0;
     uint32_t activeTime = 0;
