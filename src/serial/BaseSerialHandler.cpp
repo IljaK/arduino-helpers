@@ -44,7 +44,7 @@ void BaseSerialHandler::FlushData()
     // Waits for the transmission of outgoing serial data to complete. 
     // (Prior to Arduino 1.0, this instead removed any buffered incoming serial data.)
 	// serial->flush(); // Do not use this!
-    while (serial->available()) {
+    while (serial->available() > 0) {
         int val = serial->read();
         if (val <= 0) {
             break;
@@ -68,4 +68,10 @@ void BaseSerialHandler::StopTimeoutTimer()
         Timer::Stop(responseTimeoutTimer);
 	    responseTimeoutTimer = 0;
     }
+}
+
+
+void BaseSerialHandler::SetResponseCallBack(SerialResponseCallback responseCallback)
+{
+    this->responseCallback = responseCallback;
 }

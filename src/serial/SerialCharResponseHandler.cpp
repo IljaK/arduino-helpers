@@ -130,3 +130,24 @@ bool SerialCharResponseHandler::IsLimitReached()
 {
 	return bufferLength == bufferSize;
 }
+
+void SerialCharResponseHandler::OnResponseReceived(bool IsTimeOut, bool isOverFlow)
+{
+    if (responseCallback != NULL) {
+        responseCallback((uint8_t *)buffer, bufferLength, IsTimeOut, isOverFlow);
+    }
+}
+
+size_t SerialCharResponseHandler::write(uint8_t symbol) {
+    if (serial == NULL) return 0;
+    return serial->write(symbol);
+}
+size_t SerialCharResponseHandler::write(const uint8_t *buffer, size_t size) {
+    if (buffer == NULL || serial == NULL) return 0;
+    return serial->write((const uint8_t *)buffer, size);
+}
+
+int SerialCharResponseHandler::availableForWrite() { 
+    if (serial == NULL) return 0;
+    return serial->availableForWrite();
+}

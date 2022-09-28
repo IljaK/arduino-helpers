@@ -1,7 +1,8 @@
 #include "SerialTimerResponseHandler.h"
 
-SerialTimerResponseHandler::SerialTimerResponseHandler(Stream * serial):BaseSerialHandler(serial)
+SerialTimerResponseHandler::SerialTimerResponseHandler(Stream * serial, size_t serialRxBufferSize):BaseSerialHandler(serial)
 {
+    this->serialRxBufferSize = serialRxBufferSize;
 }
 
 SerialTimerResponseHandler::~SerialTimerResponseHandler()
@@ -13,8 +14,11 @@ void SerialTimerResponseHandler::Loop()
 {
 	BaseSerialHandler::Loop();
 	
-	if (serial && registeredBytes < serial->available()) {
+	if (serial != NULL && registeredBytes < Available()) {
 		StartTimer();
+        if (registeredBytes >= serialRxBufferSize) {
+            ResponseDetectedInternal(false, true);
+        }
 	}
 }
 
@@ -23,6 +27,7 @@ void SerialTimerResponseHandler::OnTimerComplete(TimerID timerId, uint8_t data)
 	if (messageTimer == timerId) {
 		messageTimer = 0;
 		ResponseDetectedInternal(false, false);
+        registeredBytes = Available();
 	} else {
 		BaseSerialHandler::OnTimerComplete(timerId, data);
 	}
@@ -40,12 +45,15 @@ void SerialTimerResponseHandler::OnTimerStop(TimerID timerId, uint8_t data)
 void SerialTimerResponseHandler::StartTimer()
 {
 	StopTimer();
-	if (!serial) return;
-	registeredBytes = serial->available();
+	registeredBytes = Available();
+    //Serial.print("StartTimer ");
+    //Serial.println((int)Available());
 	messageTimer = Timer::Start(this, ResponseByteTimeOut());
 }
 void SerialTimerResponseHandler::StopTimer()
 {
+    //Serial.print("StopTimer ");
+    //Serial.println((int)Available());
 	if (messageTimer != 0) {
 		Timer::Stop(messageTimer);
 		messageTimer = 0;
@@ -95,4 +103,48 @@ void SerialTimerResponseHandler::ResponseDetectedInternal(bool IsTimeOut, bool i
 {
 	StopTimer();
 	BaseSerialHandler::ResponseDetectedInternal(IsTimeOut, isOverFlow);
+}
+
+size_t SerialTimerResponseHandler::Available()
+{
+    if (serial == NULL) return 0;
+    int available = serial->available();
+    if (available <= 0) return 0;
+    return (size_t)available;
+}
+
+size_t SerialTimerResponseHandler::Write(const uint8_t data)
+{
+    if (serial == NULL) return 0;
+    return serial->write(data);
+}
+size_t SerialTimerResponseHandler::Write(const uint8_t *data, size_t size)
+{
+    if (serial == NULL) return 0;
+    if (data == NULL) return 0;
+    if (size == 0) return 0;
+
+    return serial->write(data, size);
+}
+
+size_t SerialTimerResponseHandler::ReadBytes(uint8_t *data, size_t size)
+{
+    if (serial == NULL) return 0;
+    if (data == NULL) return 0;
+
+    size = min(size, Available());
+    if (size == 0) return 0;
+
+    size_t val = serial->readBytes(data, size);
+    if (val > registeredBytes) {
+        registeredBytes = 0;
+    } else {
+        registeredBytes -= val;
+    }
+    return val;
+}
+int SerialTimerResponseHandler::Read()
+{
+    if (serial == NULL) return -1;
+    return serial->read();
 }
