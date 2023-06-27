@@ -256,3 +256,25 @@ uint8_t Timer::GetData(TimerID timerId)
 
     return data;
 }
+
+bool Timer::SetData(TimerID timerId, uint8_t data)
+{
+    if (timerId == 0) return false;
+
+    bool result = false;
+#if defined(ESP32)
+	TIMER_MUTEX_LOCK();
+#endif
+	for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
+		if (pNode->id == timerId) {
+            pNode->data = data;
+            result = true;
+            break;
+		}
+	}
+#if defined(ESP32)
+    TIMER_MUTEX_UNLOCK();
+#endif
+
+    return result;
+}

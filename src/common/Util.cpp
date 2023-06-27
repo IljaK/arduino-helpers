@@ -349,6 +349,14 @@ char *makeNewCopy(const char *target)
     result[len] = 0;
     return result;
 }
+extern bool makeSafeCopy(char *dest, const char *target, size_t copyLength)
+{
+    if (dest == NULL) return false;
+    dest[0] = 0;
+    if (target == NULL) return true;
+    strncpy(dest, target, copyLength);
+    return true;
+}
 
 /*
 #ifndef ESP32

@@ -75,6 +75,7 @@ public:
 	static unsigned long Remain(TimerID timerId);
 	static void StopAll(ITimerCallback* pCaller);
     static uint8_t GetData(TimerID timerId);
+    static bool SetData(TimerID timerId, uint8_t data);
 
     class TimerCallback: public ITimerCallback
     {
