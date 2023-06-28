@@ -63,5 +63,6 @@ extern uint8_t initPullupPin(uint8_t pin, PinMode mode, voidFuncPtr isrFunc);
 extern size_t encodeToHex(uint8_t *inArray, size_t length, char *outBuffer, bool lowerCase = false);
 extern size_t decodeFromHex(char *inBuffer, uint8_t *outArray, size_t length);
 
+// Checks target for null and allocates memory for new chat
 extern char *makeNewCopy(const char *target);
 extern bool makeSafeCopy(char *dest, const char *target, size_t destSize);

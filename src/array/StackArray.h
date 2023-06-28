@@ -52,12 +52,18 @@ public:
 
     virtual bool Insert(T item, size_t index)
     {
+        if (item == NULL) {
+            return false;
+        }
+        if (arr == NULL) {
+            return false;
+        }
+
         if (size < maxSize) {
 
             if (index >= size) {
                 return Append(item);
             }
-
             T prevItem = NULL;
             size++;
             for (size_t i = index; i < size; i++) {

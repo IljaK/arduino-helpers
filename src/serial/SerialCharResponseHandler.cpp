@@ -6,9 +6,8 @@ SerialCharResponseHandler::SerialCharResponseHandler(const size_t bufferSize, co
 {
     buffer = (char *)malloc(bufferSize);
 	buffer[0] = 0;
-	this->separator = (char *)malloc(strlen(separator) + 1);
-	strcpy(this->separator, separator);
-	separatorLength = strlen(separator);
+	this->separator = makeNewCopy(separator);
+	separatorLength = separator == NULL ? 0 : strlen(separator);
 }
 
 SerialCharResponseHandler::~SerialCharResponseHandler()

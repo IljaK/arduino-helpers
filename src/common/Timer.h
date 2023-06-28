@@ -11,7 +11,7 @@ class ITimerCallback
 public:
 	virtual ~ITimerCallback();
 	virtual void OnTimerComplete(TimerID timerId, uint8_t data) = 0;
-	virtual void OnTimerStop(TimerID timerId, uint8_t data) {};
+	virtual void OnTimerStop(TimerID timerId, uint8_t data) = 0;
 };
 
 typedef void (*timerCallBack) (TimerID timerId, uint8_t data);

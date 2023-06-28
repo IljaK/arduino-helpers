@@ -1,5 +1,6 @@
 #pragma once
 #include "StackArray.h"
+#include "../common/Util.h"
 
 class StringStackArray: public StackArray<char *>
 {
@@ -25,9 +26,8 @@ public:
         if (IsFull()) return NULL;
         if (Contains(item)) return NULL;
 
-        char *pCopy = (char *)malloc(strlen(item) + 1);
-        strcpy(pCopy, item);
-        if (!Append(pCopy)) {
+        char *pCopy = makeNewCopy(item);
+        if (pCopy != NULL && !Append(pCopy)) {
             free(pCopy);
             return NULL;
         }
@@ -41,9 +41,8 @@ public:
         if (IsFull()) return NULL;
         if (Contains(item)) return NULL;
 
-        char *pCopy = (char *)malloc(strlen(item) + 1);
-        strcpy(pCopy, item);
-        if (!Insert(pCopy, index)) {
+        char *pCopy = makeNewCopy(item);
+        if (pCopy != NULL && !Insert(pCopy, index)) {
             free(pCopy);
             return NULL;
         }

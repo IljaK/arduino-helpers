@@ -355,6 +355,7 @@ extern bool makeSafeCopy(char *dest, const char *target, size_t copyLength)
     dest[0] = 0;
     if (target == NULL) return true;
     strncpy(dest, target, copyLength);
+    dest[copyLength] = 0;
     return true;
 }
 
