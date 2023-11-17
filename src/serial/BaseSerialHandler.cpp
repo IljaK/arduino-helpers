@@ -44,9 +44,16 @@ void BaseSerialHandler::FlushData()
     // Waits for the transmission of outgoing serial data to complete. 
     // (Prior to Arduino 1.0, this instead removed any buffered incoming serial data.)
 	// serial->flush(); // Do not use this!
+    
+    u_int32_t count = 0;
     while (serial->available() > 0) {
+        count++;
         int val = serial->read();
         if (val <= 0) {
+            break;
+        }
+        // For safe reasons
+        if (count > 4096) {
             break;
         }
     }
