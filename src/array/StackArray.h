@@ -83,16 +83,38 @@ public:
 
     virtual T UnshiftFirst()
     {
-        return Unshift(0);
+        return Unshift((size_t)0);
     }
     virtual bool FreeFirst()
     {
-        T item = Unshift(0);
+        T item = Unshift((size_t)0);
         if (item != NULL) {
             FreeItem(item);
             return true;
         }
         return false;
+    }
+
+    virtual T Unshift(T item) {
+        if (size == 0) {
+            return NULL;
+        }
+        T foundItem = NULL;
+
+        for(size_t i = 0; i < size; i++) {
+            if (foundItem != NULL) {
+                arr[i] = arr[i+1];
+                continue;
+            }
+            if (item == arr[i]) {
+                foundItem = arr[i];
+                arr[i] = arr[i+1];
+            }
+        }
+        if (foundItem != NULL) {
+            size--;
+        }
+        return foundItem;
     }
 
     virtual T Unshift(size_t index)
