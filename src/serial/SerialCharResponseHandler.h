@@ -27,7 +27,7 @@ public:
     int availableForWrite() override;
     
 	SerialCharResponseHandler(const size_t bufferSize, const char *separator, Stream * serial);
-	~SerialCharResponseHandler();
+	virtual ~SerialCharResponseHandler();
 
 	void Loop() override;
 	bool IsBusy() override;
