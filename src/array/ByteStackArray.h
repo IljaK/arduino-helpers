@@ -1,44 +1,28 @@
 #pragma once
 #include "../common/Util.h"
 #include "StackArray.h"
-
-struct ByteArray {
-    size_t length;
-    uint8_t * array;
-};
+#include "ByteArray.h"
 
 class ByteStackArray: public StackArray<ByteArray *>
 {
 private:
     size_t AppendToItem(ByteArray *item , uint8_t * data, size_t length) {
 
-        size_t append = maxItemLength - item->length;
+        if (item == NULL) return 0;
+
+
+        size_t append = maxItemLength - item->GetLength();
         if (append > length) append = length;
 
-        uint8_t * array = NULL;
-        if (item->array == NULL) {
-            array = (uint8_t *)malloc(append);
-        } else {
-            array = (uint8_t *)realloc(item->array, item->length + append);
+        if (item->AppendArray(data, append)) {
+            return append;
         }
-        if (array == NULL) {
-            // Could not reallocate memory!
-            return 0;
-        }
-
-        memcpy(array + item->length, data, append);
-
-        item->array = array;
-        item->length += append;
-        // Append available here
-        return append;
+        return 0;
 
     }
 
     ByteArray * InsertNewItem(size_t index) {
-        arr[index] = (ByteArray *)malloc(sizeof(ByteArray));
-        arr[index]->length = 0;
-        arr[index]->array = NULL;
+        arr[index] = new ByteArray();
         size++;
         return arr[index];
     }
@@ -53,7 +37,7 @@ private:
 
         ByteArray *lastItem = arr[Size() - 1];
 
-        if (lastItem->length < maxItemLength) {
+        if (lastItem->GetLength() < maxItemLength) {
             return AppendToItem(lastItem, data, length);
         } 
         
@@ -64,15 +48,10 @@ private:
         
         return AppendToItem(InsertNewItem(Size()), data, length);
     }
-protected:
-
 public:
     void FreeItem(ByteArray * item) override {
         if (item != NULL) {
-            if (item->array != NULL) {
-                free(item->array);
-            }
-            free(item);
+            delete item;
         }
     }
     const size_t maxItemLength;
@@ -105,7 +84,7 @@ public:
 
     bool HasFilledPacket() {
         if (Size() == 1) {
-            return arr[0]->length == maxItemLength;
+            return arr[0]->GetLength() == maxItemLength;
         }
         return Size() > 0;
     }

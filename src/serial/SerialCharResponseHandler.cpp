@@ -22,7 +22,7 @@ void SerialCharResponseHandler::Loop()
 	if (serial) {
         while (serial->available() > 0) {
             int val = serial->read();
-            if (val <= 0) {
+            if (val < 0) {
                 return;
             }
             if (LoadSymbolFromBuffer(val)) {
@@ -39,6 +39,20 @@ void SerialCharResponseHandler::Loop()
 
 bool SerialCharResponseHandler::LoadSymbolFromBuffer(uint8_t symbol)
 {
+    if (expectFixedLength != 0) {
+        if (!AppendSymbolToBuffer(symbol)) {
+            expectFixedLength = 0;
+            ResponseDetectedInternal(false, true);
+            return true;
+        }
+        if (bufferLength >= expectFixedLength) {
+            expectFixedLength = 0;
+            ResponseDetectedInternal(false, false);
+            return true;
+        }
+        return false;
+    }
+
 	// sepparator symbol match
 	if (separator[separatorMatchedLength] == symbol) {
 		separatorMatchedLength++;
@@ -149,4 +163,10 @@ size_t SerialCharResponseHandler::write(const uint8_t *buffer, size_t size) {
 int SerialCharResponseHandler::availableForWrite() { 
     if (serial == NULL) return 0;
     return serial->availableForWrite();
+}
+
+void SerialCharResponseHandler::SetExpectFixedLength(size_t expectFixedLength, uint32_t timeout)
+{
+    this->expectFixedLength = expectFixedLength;
+    StartTimeoutTimer(timeout);
 }

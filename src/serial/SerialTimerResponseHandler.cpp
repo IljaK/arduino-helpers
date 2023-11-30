@@ -1,6 +1,6 @@
 #include "SerialTimerResponseHandler.h"
 
-SerialTimerResponseHandler::SerialTimerResponseHandler(Stream * serial, size_t serialRxBufferSize):BaseSerialHandler(serial)
+SerialTimerResponseHandler::SerialTimerResponseHandler(Stream * serial, size_t serialRxBufferSize):BaseSerialHandler(serial), messageTimer(this)
 {
     this->serialRxBufferSize = serialRxBufferSize;
 }
@@ -22,24 +22,14 @@ void SerialTimerResponseHandler::Loop()
 	}
 }
 
-void SerialTimerResponseHandler::OnTimerComplete(TimerID timerId, uint8_t data)
+void SerialTimerResponseHandler::OnTimerComplete(Timer *timer)
 {
-	if (messageTimer == timerId) {
-		messageTimer = 0;
+	if (&messageTimer == timer) {
 		ResponseDetectedInternal(false, false);
         registeredBytes = Available();
-	} else {
-		BaseSerialHandler::OnTimerComplete(timerId, data);
+        return;
 	}
-}
-
-void SerialTimerResponseHandler::OnTimerStop(TimerID timerId, uint8_t data)
-{
-	if (messageTimer == timerId) {
-		messageTimer = 0;
-	} else {
-		BaseSerialHandler::OnTimerStop(timerId, data);
-	}
+	BaseSerialHandler::OnTimerComplete(timer);
 }
 
 void SerialTimerResponseHandler::StartTimer()
@@ -48,16 +38,13 @@ void SerialTimerResponseHandler::StartTimer()
 	registeredBytes = Available();
     //Serial.print("StartTimer ");
     //Serial.println((int)Available());
-	messageTimer = Timer::Start(this, ResponseByteTimeOut());
+    messageTimer.StartMicros(ResponseByteTimeOut());
 }
 void SerialTimerResponseHandler::StopTimer()
 {
     //Serial.print("StopTimer ");
     //Serial.println((int)Available());
-	if (messageTimer != 0) {
-		Timer::Stop(messageTimer);
-		messageTimer = 0;
-	}
+    messageTimer.Stop();
 	StopTimeoutTimer();
 }
 
@@ -90,7 +77,7 @@ double SerialTimerResponseHandler::SingleByteTransferDuration()
 
 bool SerialTimerResponseHandler::IsBusy()
 {
-	return messageTimer != 0 || BaseSerialHandler::IsBusy();
+	return !messageTimer.IsRunning() || BaseSerialHandler::IsBusy();
 }
 
 void SerialTimerResponseHandler::FlushData()

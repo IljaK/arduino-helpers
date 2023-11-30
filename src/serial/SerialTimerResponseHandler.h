@@ -7,7 +7,7 @@ class SerialTimerResponseHandler: protected BaseSerialHandler
 {
 protected:
     size_t serialRxBufferSize = 0;
-	TimerID messageTimer = 0;
+	Timer messageTimer;
 	size_t registeredBytes = 0;
 
 	void StartTimer();
@@ -26,8 +26,7 @@ public:
 	virtual uint32_t GetBaudRate();
 
 	void FlushData() override;
-	void OnTimerComplete(TimerID timerId, uint8_t data) override;
-    void OnTimerStop(TimerID timerId, uint8_t data) override;
+	void OnTimerComplete(Timer *timer) override;
 
 	virtual unsigned long ResponseByteTimeOut();
 

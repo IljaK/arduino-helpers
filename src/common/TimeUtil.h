@@ -1,6 +1,7 @@
 #pragma once
 #include "Arduino.h"
 #include <time.h>
+#include "TimeDefines.h"
 
 #ifndef ONE_HOUR
 #define ONE_HOUR 3600
@@ -8,7 +9,6 @@
 
 constexpr uint16_t QUATER_HOUR_SECONDS = (uint16_t)ONE_HOUR / (uint16_t)4u;
 constexpr uint16_t QUATER_HOUR_MINUTES = (uint16_t)60 / (uint16_t)4u;
-constexpr uint32_t MICROS_IN_SECOND = 1000000ul;
 
 struct tmz: public tm
 {

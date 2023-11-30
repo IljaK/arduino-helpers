@@ -1,6 +1,6 @@
 #include "Button.h"
 
-Button::Button(ClickFuncPtr clickCallBack):ITimerCallback()
+Button::Button(ClickFuncPtr clickCallBack):ITimerCallback(), multiClickTimer(this)
 {
     this->clickCallBack = clickCallBack;
 }
@@ -22,12 +22,8 @@ void Button::Loop()
 }
 void Button::OnBtnReleased()
 {
-    if (multiClickTimer != 0) {
-        Timer::Stop(multiClickTimer);
-        multiClickTimer = 0;
-    }
     multiClicks++;
-    multiClickTimer = Timer::Start(this, MULTI_CLICK_WAIT);
+    multiClickTimer.StartMicros(MULTI_CLICK_WAIT);
 }
 void Button::ProcessClick()
 {
@@ -42,10 +38,7 @@ void Button::ProcessClick()
 }
 void Button::OnBtnPressed()
 {
-    if (multiClickTimer != 0) {
-        Timer::Stop(multiClickTimer);
-        multiClickTimer = 0;
-    }
+    multiClickTimer.Stop();
 }
 
 bool Button::IsPressed()
@@ -53,17 +46,9 @@ bool Button::IsPressed()
     return btnState == LOW;
 }
 
-void Button::OnTimerComplete(TimerID timerId, uint8_t data)
+void Button::OnTimerComplete(Timer *timer)
 {
-    if (timerId == multiClickTimer) {
-        multiClickTimer = 0;
+    if (timer == &multiClickTimer) {
         ProcessClick();
-    }
-}
-
-void Button::OnTimerStop(TimerID timerId, uint8_t data)
-{
-    if (timerId == multiClickTimer) {
-        multiClickTimer = 0;
     }
 }

@@ -1,103 +1,71 @@
 #pragma once
 #include <Arduino.h>
+#include "TimeDefines.h"
 
-typedef size_t TimerID;
+enum TIMER_STATE: uint8_t {
+    TIMER_STATE_NONE,
+    TIMER_STATE_RUNNING,
+    TIMER_STATE_COMPLETED,
+};
 
-#define MILLI_SECONDS 1000ul
-#define MICRO_SECONDS 1000000ul
+class Timer;
+class TimerNode;
 
 class ITimerCallback
 {
 public:
 	virtual ~ITimerCallback();
-	virtual void OnTimerComplete(TimerID timerId, uint8_t data) = 0;
-	virtual void OnTimerStop(TimerID timerId, uint8_t data) = 0;
+	virtual void OnTimerComplete(Timer *timer);
 };
 
-typedef void (*timerCallBack) (TimerID timerId, uint8_t data);
-
-struct TimerNode
-{
-    TimerNode(ITimerCallback *pCaller, unsigned long duration, uint8_t data) {
-        this->pCaller = pCaller;
-        this->remain = duration;
-        this->data = data;
-        this->updateStamp = micros();
-    }
-	ITimerCallback *pCaller;
-	unsigned long remain;
-	unsigned long updateStamp;
-	uint8_t data;
-	TimerID id = 0;
-	TimerNode *pNext = NULL;
-
-    bool IsCompleted() {
-        if (remain == 0) return true;
-
-        unsigned long delta = micros() - this->updateStamp;
-        this->updateStamp += delta;
-
-        if (remain < delta) {
-            remain = 0;
-        } else {
-            remain -= delta;
-        }
-        return (remain == 0);
-    }
-
-    bool IsStopped() {
-        return id == 0;
-    }
-
-    unsigned long Remain() {
-        return remain;
-    }
-
-};
+typedef void (*timerCallBack) (Timer *timer);
 
 class Timer
 {
-protected:
+private:
+    TIMER_STATE state = TIMER_STATE_NONE;
+    ITimerCallback *pCallback;
+	uint64_t remainMicros = 0;
+    uint32_t prevStamp = 0;
+public:
+    Timer(ITimerCallback *pCallback); 
+    void StartMicros(uint64_t micros);
+    void StartMillis(uint64_t millis);
+    void StartSeconds(uint64_t seconds);
+
+    void Stop();
+
+    bool Update();
+
+    uint64_t RemainMicros();
+
+    uint64_t RemainMillis();
+    uint64_t RemainSeconds();
+
+    bool IsRunning();
+    virtual ~Timer();
+
+private:
 #if defined(ESP32)
 	static SemaphoreHandle_t xTimerSemaphore;
 #endif
-	static TimerNode *pFirst;
-	static TimerNode *pProcessing;
-	static TimerNode *pProcessingPrev;
-    static void LoopCompleted();
-    static TimerID AddNode(ITimerCallback *pCaller, unsigned long duration, uint8_t data);
+    static TimerNode *pFirst;
+    
+    static void AddTimer(Timer *node);
+    static void RemoveTimer(Timer *node);
 public:
-	static TimerID Start(ITimerCallback *pCaller, unsigned long duration, uint8_t data = 0);
-	static TimerID Start(timerCallBack completeCB, unsigned long duration, uint8_t data = 0, timerCallBack stopCB = NULL);
-	static void Loop();
-	static bool Stop(TimerID timerId);
-	static bool Contains(ITimerCallback *pCaller, uint8_t data);
-	static unsigned long Remain(TimerID timerId);
-	static void StopAll(ITimerCallback* pCaller);
-    static uint8_t GetData(TimerID timerId);
-    static bool SetData(TimerID timerId, uint8_t data);
+    static void Loop();
+    static void RemoveAll(ITimerCallback* pCaller);
+};
 
-    class TimerCallback: public ITimerCallback
-    {
-    private:
-        timerCallBack completeCB = NULL;
-        timerCallBack stopCB = NULL;
-    public:
-        TimerCallback(timerCallBack completeCB, timerCallBack stopCB = NULL) {
-            this->completeCB = completeCB;
-            this->stopCB = stopCB;
-        };
-        virtual ~TimerCallback() {
-            this->completeCB = NULL;
-            this->stopCB = NULL;
-        };
-        void OnTimerComplete(TimerID timerId, uint8_t data) override {
-            if (completeCB != NULL) completeCB(timerId, data);
-            delete this;
-        }
-        void OnTimerStop(TimerID timerId, uint8_t data) override {
-            if (stopCB != NULL) stopCB(timerId, data);
-            delete this;
-        }
-    };
+
+class TimerNode 
+{
+public:
+    Timer *pTimer;
+    TimerNode *pNext = NULL;
+
+    TimerNode(Timer *pTimer) {
+        this->pTimer = pTimer;
+    }
 };

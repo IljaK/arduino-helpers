@@ -1,33 +1,28 @@
 #include <gtest/gtest.h>
 #include "common/Timer.h"
 #include <Arduino.h>
-#include "mock/TimerMock.h"
 
 TEST(TimerTest, TimerTestRunStop)
 {
 	timeOffset = 0;
-	TimerMock::Reset();
-
-			
-	TimerMock timerMock;
+	Timer timer;
 
 	Timer::Loop();
-	timerMock.Start(1000000ul);
+	timer.Start(1000000ul);
 	Timer::Loop();
 
 	//wchar_t message[128];
 	//swprintf(message, 128, L"Timer IsRunning Failed! now: %lu, Remain: %lu", micros(), timerMock.Remain());
 	//Assert::IsFalse(timerMock.IsCompleted(), message);
-	EXPECT_FALSE(timerMock.IsCompleted());
+	EXPECT_FALSE(timer.IsCompleted());
 
 	timeOffset = 1000000ul;
 	Timer::Loop();
 
-	EXPECT_TRUE(timerMock.IsCompleted());
+	EXPECT_TRUE(timer.IsCompleted());
 
 	Timer::StopAll(&timerMock);
 	timeOffset = 0;
-	TimerMock::Reset();
 
 	//swprintf(message, 128, L"Timer Complete Failed! now: %lu, Remain: %lu", micros(), timerMock.Remain());
 	//Assert::IsTrue(timerMock.IsCompleted(), message);

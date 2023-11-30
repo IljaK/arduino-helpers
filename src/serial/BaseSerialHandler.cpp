@@ -1,6 +1,6 @@
 #include "BaseSerialHandler.h"
 
-BaseSerialHandler::BaseSerialHandler(Stream * serial):ITimerCallback()
+BaseSerialHandler::BaseSerialHandler(Stream * serial):ITimerCallback(), responseTimeoutTimer(this)
 {
 	this->serial = serial;
 }
@@ -10,17 +10,10 @@ BaseSerialHandler::~BaseSerialHandler()
 	StopTimeoutTimer();
 }
 
-void BaseSerialHandler::OnTimerComplete(TimerID timerId, uint8_t data)
+void BaseSerialHandler::OnTimerComplete(Timer *timer)
 {
-	if (responseTimeoutTimer == timerId) {
-		responseTimeoutTimer = 0;
+	if (&responseTimeoutTimer == timer) {
 		ResponseDetectedInternal(true, false);
-	}
-}
-void BaseSerialHandler::OnTimerStop(TimerID timerId, uint8_t data)
-{
-	if (responseTimeoutTimer == timerId) {
-		responseTimeoutTimer = 0;
 	}
 }
 
@@ -36,7 +29,7 @@ void BaseSerialHandler::OnResponseReceived(bool IsTimeOut, bool isOverFlow)
 
 bool BaseSerialHandler::IsBusy()
 {
-	return responseTimeoutTimer != 0;
+	return responseTimeoutTimer.IsRunning();
 }
 
 void BaseSerialHandler::FlushData()
@@ -67,14 +60,11 @@ void BaseSerialHandler::StartTimeoutTimer(unsigned long microSecTimeOut)
 {
 	if (microSecTimeOut == 0) return;
 	StopTimeoutTimer();
-	responseTimeoutTimer = Timer::Start(this, microSecTimeOut);
+    responseTimeoutTimer.StartMicros(microSecTimeOut);
 }
 void BaseSerialHandler::StopTimeoutTimer()
 {
-	if (responseTimeoutTimer != 0) {
-        Timer::Stop(responseTimeoutTimer);
-	    responseTimeoutTimer = 0;
-    }
+	responseTimeoutTimer.Stop();
 }
 
 

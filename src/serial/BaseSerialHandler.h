@@ -11,7 +11,7 @@ protected:
     SerialResponseCallback responseCallback = NULL;
 
 	Stream * serial = NULL;
-	TimerID responseTimeoutTimer = 0;
+	Timer responseTimeoutTimer;
 
 	virtual void ResponseDetectedInternal(bool IsTimeOut, bool isOverFlow = false);
 	
@@ -21,8 +21,7 @@ public:
 
 	void StartTimeoutTimer(unsigned long microSecTimeOut);
 	void StopTimeoutTimer();
-	void OnTimerComplete(TimerID timerId, uint8_t data) override;
-	void OnTimerStop(TimerID timerId, uint8_t data) override;
+	void OnTimerComplete(Timer * timer) override;
 
 	virtual bool IsBusy();
 

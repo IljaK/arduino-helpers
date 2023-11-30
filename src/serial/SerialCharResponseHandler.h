@@ -8,11 +8,12 @@ private:
 	char *separator;
 	size_t separatorLength;
 	size_t separatorMatchedLength = 0;
+    size_t expectFixedLength = 0;
 
 	bool AppendSymbolToBuffer(uint8_t symbol);
 	bool IsSeparatorRemainMatch(int remainSeparatorLength, uint8_t symbol);
 protected:
-	void ResponseDetectedInternal(bool IsTimeOut, bool isOverFlow = false) override;
+	void ResponseDetectedInternal(bool IsTimeOut, bool isOverFlow) override;
 	virtual void ResetBuffer();
 	virtual bool LoadSymbolFromBuffer(uint8_t symbol);
 	size_t bufferLength = 0;
@@ -36,5 +37,6 @@ public:
     bool IsLimitReached();
 
     void OnResponseReceived(bool IsTimeOut, bool isOverFlow = false) override;
+    virtual void SetExpectFixedLength(size_t expectFixedLength, uint32_t timeout);
 };
 

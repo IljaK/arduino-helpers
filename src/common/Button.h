@@ -12,7 +12,7 @@ private:
     volatile uint8_t pinState = LOW;
     uint8_t btnState = LOW;
     ClickFuncPtr clickCallBack = NULL;
-    TimerID multiClickTimer = 0;
+    Timer multiClickTimer;
     uint8_t multiClicks = 0;
 
     inline void OnBtnReleased();
@@ -25,6 +25,5 @@ public:
     inline void ChangeState() { pinState = !pinState; }
     bool IsPressed();
 
-    void OnTimerComplete(TimerID timerId, uint8_t data) override;
-    void OnTimerStop(TimerID timerId, uint8_t data) override;
+    void OnTimerComplete(Timer *timer) override;
 };

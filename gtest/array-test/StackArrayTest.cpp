@@ -51,7 +51,6 @@ TEST(ByteStackArrayTest, ByteStackArrayTestAppendUnshift)
 
 	EXPECT_EQ(arr->length, 10);
 
-	free(arr->array);
 	free(arr);
 
 	EXPECT_EQ(byteStackArray.Size(), 1);
@@ -60,7 +59,6 @@ TEST(ByteStackArrayTest, ByteStackArrayTestAppendUnshift)
 
 	EXPECT_EQ(arr->length, 5);
 
-	free(arr->array);
 	free(arr);
 
 	EXPECT_EQ(byteStackArray.Size(), 0);
@@ -85,14 +83,12 @@ TEST(ByteStackArrayTest, ByteStackArrayTestSpecial)
 
 	EXPECT_EQ(item->length, sizePerItem);
 
-	free(item->array);
 	free(item);
 
 	item = byteStackArray.UnshiftFirst();
 
 	EXPECT_EQ(item->length, len - sizePerItem);
 
-	free(item->array);
 	free(item);
 }
 
