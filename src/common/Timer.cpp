@@ -23,12 +23,12 @@ Timer::~Timer() {
     RemoveTimer(this);
 }
 
-void Timer::StartMicros(uint64_t dirationMicros) {
+void Timer::StartMicros(uint64_t durationMicros) {
 #if defined(ESP32)
 	TIMER_MUTEX_LOCK();
 #endif
     this->prevStamp = micros();
-    this->remainMicros = dirationMicros;
+    this->remainMicros = durationMicros;
     this->state = TIMER_STATE_RUNNING;
 #if defined(ESP32)
     TIMER_MUTEX_UNLOCK();
@@ -57,17 +57,16 @@ bool Timer::Update() {
 #if defined(ESP32)
 	TIMER_MUTEX_LOCK();
 #endif
-    if (!IsRunning()) return false;
-
-    uint32_t stamp = micros();
-    uint64_t delta = 0;
-    delta = stamp - prevStamp;
-    if (delta == 0) {
+    if (!IsRunning()) {
 #if defined(ESP32)
         TIMER_MUTEX_UNLOCK();
 #endif
         return false;
     }
+
+    uint32_t stamp = micros();
+    uint64_t delta = 0;
+    delta = stamp - prevStamp;
 
     if (delta >= remainMicros) {
         remainMicros = 0;
