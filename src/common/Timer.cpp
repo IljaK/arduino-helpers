@@ -45,7 +45,12 @@ void Timer::Stop() {
 #if defined(ESP32)
 	TIMER_MUTEX_LOCK();
 #endif
-    if (!IsRunning()) return;
+    if (!IsRunning()) {
+#if defined(ESP32)
+        TIMER_MUTEX_UNLOCK();
+#endif
+        return;
+    }
     state = TIMER_STATE_NONE;
     remainMicros = 0;
 #if defined(ESP32)
