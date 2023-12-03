@@ -160,10 +160,12 @@ size_t SerialCharResponseHandler::write(const uint8_t *buffer, size_t size) {
     return serial->write((const uint8_t *)buffer, size);
 }
 
+/*
 int SerialCharResponseHandler::availableForWrite() { 
     if (serial == NULL) return 0;
     return serial->availableForWrite();
 }
+*/
 
 void SerialCharResponseHandler::SetExpectFixedLength(size_t expectFixedLength, uint32_t timeout)
 {

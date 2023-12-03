@@ -19,13 +19,13 @@ protected:
 	size_t bufferLength = 0;
 	char *buffer = NULL;
 
-    size_t write(uint8_t symbol) override;
-    size_t write(const uint8_t *buffer, size_t size) override;
+    size_t write(uint8_t symbol);
+    size_t write(const uint8_t *buffer, size_t size);
 
 public:
     const size_t bufferSize;
 
-    int availableForWrite() override;
+    //int availableForWrite();
     
 	SerialCharResponseHandler(const size_t bufferSize, const char *separator, Stream * serial);
 	virtual ~SerialCharResponseHandler();

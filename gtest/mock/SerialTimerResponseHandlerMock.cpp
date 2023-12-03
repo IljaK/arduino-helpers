@@ -1,6 +1,6 @@
 #include "SerialTimerResponseHandlerMock.h"
 
-SerialTimerResponseHandlerMock::SerialTimerResponseHandlerMock(Stream *serial): SerialTimerResponseHandler(serial), BaseSerialMock(serial)
+SerialTimerResponseHandlerMock::SerialTimerResponseHandlerMock(Stream *serial): SerialTimerResponseHandler(serial, 2048), BaseSerialMock(serial)
 {
 	receivedCommand[0] = 0;
 	receivedLength = 0;

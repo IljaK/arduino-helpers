@@ -150,6 +150,7 @@ void Timer::RemoveAll(ITimerCallback* pCaller)
 #endif 
     for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
         if (pNode->pTimer != NULL && pCaller == pNode->pTimer->pCallback) {
+            pNode->pTimer->pCallback = NULL;
             pNode->pTimer = NULL;
         }
     }
@@ -191,4 +192,37 @@ void Timer::RemoveTimer(Timer *pTimer)
 #if defined(ESP32)
     TIMER_MUTEX_UNLOCK();
 #endif
+}
+
+
+uint32_t Timer::GetNodesCount()
+{
+    uint32_t count = 0;
+    for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
+        count++;
+    }
+    return count;
+}
+uint32_t Timer::GetActiveNodesCount()
+{
+    uint32_t count = 0;
+    for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
+        if (pNode->pTimer != NULL) {
+            count++;
+        }
+    }
+    return count;
+}
+
+uint32_t Timer::GetRunningNodesCount()
+{
+    uint32_t count = 0;
+    for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
+        if (pNode->pTimer != NULL) {
+            if (pNode->pTimer->IsRunning()) {
+                count++;
+            }
+        }
+    }
+    return count;
 }

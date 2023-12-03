@@ -4,14 +4,13 @@
 #include "measurements/VoltMeter.h"
 #include <Util.h>
 #include <math.h>
-#include "mock/TimerMock.h"
 
 
 
 TEST(VoltMeterTest, MeasureValueTest)
 {
 	timeOffset = 0;
-	TimerMock::Reset();
+	//TimerMock::Reset();
 
 	double expectedVoltage = 12.0;
 

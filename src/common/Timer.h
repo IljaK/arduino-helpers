@@ -56,6 +56,9 @@ private:
 public:
     static void Loop();
     static void RemoveAll(ITimerCallback* pCaller);
+    static uint32_t GetNodesCount();
+    static uint32_t GetActiveNodesCount();
+    static uint32_t GetRunningNodesCount();
 };
 
 

@@ -10,19 +10,19 @@ TEST(ByteStackArrayTest, ByteStackArrayAppendTest)
 
     bStackArray.Append((uint8_t *)data1, sizeof(data1));
     ByteArray * dt = bStackArray.Peek();
-    char * res = (char *)dt->array;
+    char * res = (char *)dt->GetArray();
 
 	EXPECT_EQ(bStackArray.Size(), 1);
 
     bStackArray.Append((uint8_t *)data2, sizeof(data2));
 
-	EXPECT_EQ(dt->length, bStackArray.maxItemLength);
+	EXPECT_EQ(dt->GetLength(), bStackArray.maxItemLength);
 	EXPECT_EQ(bStackArray.Size(), 2);
 
     dt = bStackArray.Peek(1);
-    res = (char *)dt->array;
+    res = (char *)dt->GetArray();
 
-    EXPECT_EQ(dt->length, 4);
+    EXPECT_EQ(dt->GetLength(), 4);
 
     dt = bStackArray.UnshiftFirst();
 

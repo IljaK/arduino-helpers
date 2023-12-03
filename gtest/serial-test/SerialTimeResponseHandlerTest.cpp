@@ -3,14 +3,14 @@
 #include "../mock/SerialTimerResponseHandlerMock.h"
 #include "../mock/BaseSerialHandlerMock.h"
 #include <Stream.h>
-#include "../mock/TimerMock.h"
+//#include "../mock/TimerMock.h"
 
 TEST(SerialTimeResponseHandlerTest, ResponseTimerTest)
 {
 	char data1[] = "1"; // length = 8
 
 	timeOffset = 0;
-	TimerMock::Reset();
+	//TimerMock::Reset();
 
 	Stream serial;
 	SerialTimerResponseHandlerMock timerResponseHandler(&serial);
@@ -46,7 +46,6 @@ TEST(SerialTimeResponseHandlerTest, ResponseTimerTest)
 				Assert::Fail(message);
 			} */
 
-			Timer::StopAll(&timerResponseHandler);
 			return;
 		}
 		timeOffset += timerResponseHandler.ResponseByteTimeOut();

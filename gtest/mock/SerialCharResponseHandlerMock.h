@@ -9,8 +9,11 @@ public:
 	char receivedCommand[SERIAL_RX_BUFFER_SIZE];
 
 	SerialCharResponseHandlerMock(const size_t bufferSize, const char *separator, Stream* stream);
-	~SerialCharResponseHandlerMock();
+	virtual ~SerialCharResponseHandlerMock();
 
 	void OnResponseReceived(bool IsTimeOut, bool isOverFlow = false) override;
 	void Clear() override;
+
+    int read() override;
+    int available()  override;
 };

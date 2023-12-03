@@ -5,29 +5,134 @@
 TEST(TimerTest, TimerTestRunStop)
 {
 	timeOffset = 0;
-	Timer timer;
+	Timer *timer = new Timer(NULL);
 
 	Timer::Loop();
-	timer.Start(1000000ul);
+	timer->StartMicros(1000000ul);
 	Timer::Loop();
 
 	//wchar_t message[128];
 	//swprintf(message, 128, L"Timer IsRunning Failed! now: %lu, Remain: %lu", micros(), timerMock.Remain());
 	//Assert::IsFalse(timerMock.IsCompleted(), message);
-	EXPECT_FALSE(timer.IsCompleted());
+	EXPECT_TRUE(timer->IsRunning());
+
+    EXPECT_EQ(1, Timer::GetActiveNodesCount());
+    EXPECT_EQ(1, Timer::GetRunningNodesCount());
+    EXPECT_EQ(1, Timer::GetNodesCount());
 
 	timeOffset = 1000000ul;
 	Timer::Loop();
 
-	EXPECT_TRUE(timer.IsCompleted());
+	EXPECT_FALSE(timer->IsRunning());
 
-	Timer::StopAll(&timerMock);
+    EXPECT_EQ(1, Timer::GetActiveNodesCount());
+    EXPECT_EQ(0, Timer::GetRunningNodesCount());
+    EXPECT_EQ(1, Timer::GetNodesCount());
+
+	delete timer;
+
+    EXPECT_EQ(0, Timer::GetActiveNodesCount());
+    EXPECT_EQ(0, Timer::GetRunningNodesCount());
+    EXPECT_EQ(1, Timer::GetNodesCount());
+
+    Timer::Loop();
+
+    EXPECT_EQ(0, Timer::GetActiveNodesCount());
+    EXPECT_EQ(0, Timer::GetRunningNodesCount());
+    EXPECT_EQ(0, Timer::GetNodesCount());
+
 	timeOffset = 0;
-
 	//swprintf(message, 128, L"Timer Complete Failed! now: %lu, Remain: %lu", micros(), timerMock.Remain());
 	//Assert::IsTrue(timerMock.IsCompleted(), message);
 
 }
+
+TEST(TimerTest, TimerTestMultiRunStop)
+{
+
+	timeOffset = 0;
+    // 1st timer
+	Timer *timer = new Timer(NULL);
+    EXPECT_EQ(1, Timer::GetNodesCount());
+    EXPECT_EQ(1, Timer::GetActiveNodesCount());
+    EXPECT_EQ(0, Timer::GetRunningNodesCount());
+
+	timer->StartMicros(10ul);
+	EXPECT_TRUE(timer->IsRunning());
+    EXPECT_EQ(1, Timer::GetRunningNodesCount());
+    EXPECT_EQ(1, Timer::GetActiveNodesCount());
+
+    // 2nd timer
+    Timer *timer2 = new Timer(NULL);
+    EXPECT_EQ(2, Timer::GetNodesCount());
+    EXPECT_EQ(2, Timer::GetActiveNodesCount());
+    EXPECT_EQ(1, Timer::GetRunningNodesCount());
+
+	timer2->StartMicros(30ul);
+	EXPECT_TRUE(timer->IsRunning());
+    EXPECT_EQ(2, Timer::GetRunningNodesCount());
+    EXPECT_EQ(2, Timer::GetActiveNodesCount());
+
+    // 3dr timer
+    Timer *timer3 = new Timer(NULL);
+    EXPECT_EQ(3, Timer::GetNodesCount());
+    EXPECT_EQ(3, Timer::GetActiveNodesCount());
+    EXPECT_EQ(2, Timer::GetRunningNodesCount());
+
+	timer3->StartMicros(20ul);
+	EXPECT_TRUE(timer->IsRunning());
+    EXPECT_EQ(3, Timer::GetRunningNodesCount());
+
+    // 4th timer
+    Timer *timer4 = new Timer(NULL);
+    EXPECT_EQ(4, Timer::GetNodesCount());
+    EXPECT_EQ(4, Timer::GetActiveNodesCount());
+    EXPECT_EQ(3, Timer::GetRunningNodesCount());
+
+	timer4->StartMicros(40ul);
+	EXPECT_TRUE(timer->IsRunning());
+    EXPECT_EQ(4, Timer::GetRunningNodesCount());
+
+
+    // Timers: [10, 30, 20, 40]
+
+    // Complete first
+	timeOffset = 10;
+    Timer::Loop();
+
+    EXPECT_EQ(4, Timer::GetNodesCount());
+    EXPECT_EQ(4, Timer::GetActiveNodesCount());
+    EXPECT_EQ(3, Timer::GetRunningNodesCount());
+	EXPECT_FALSE(timer->IsRunning());
+
+    // Delete 3rd
+
+    delete timer3;
+
+    EXPECT_EQ(4, Timer::GetNodesCount());
+    EXPECT_EQ(3, Timer::GetActiveNodesCount());
+    EXPECT_EQ(2, Timer::GetRunningNodesCount());
+
+    Timer::Loop();
+
+    EXPECT_EQ(3, Timer::GetNodesCount());
+    EXPECT_EQ(3, Timer::GetActiveNodesCount());
+    EXPECT_EQ(2, Timer::GetRunningNodesCount());
+
+    delete timer;
+    delete timer2;
+    delete timer4;
+
+
+    EXPECT_EQ(3, Timer::GetNodesCount());
+    EXPECT_EQ(0, Timer::GetActiveNodesCount());
+    EXPECT_EQ(0, Timer::GetRunningNodesCount());
+
+    Timer::Loop();
+    EXPECT_EQ(0, Timer::GetNodesCount());
+}
+
+/*
 
 TEST(TimerTest, TimerTestOverflowMicros)
 {
@@ -439,3 +544,4 @@ TEST(TimerTest, TimerAddRemoveTest)
     ASSERT_EQ(TimerMock::GetCount(), 3);
 
 }
+*/

@@ -22,3 +22,14 @@ void SerialCharResponseHandlerMock::Clear() {
 	receivedCommand[0] = 0;
 	BaseSerialMock::Clear();
 }
+
+
+int SerialCharResponseHandlerMock::read()
+{
+    return 0;
+}
+
+int SerialCharResponseHandlerMock::available()
+{
+    return 0;
+}
