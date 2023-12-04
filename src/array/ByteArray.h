@@ -42,7 +42,7 @@ public:
     }
     
     void Clear() {
-        if (this->array == NULL) {
+        if (this->array != NULL) {
             free(this->array);
         }
         this->length = 0;

@@ -145,6 +145,7 @@ void Timer::Loop()
 
 void Timer::RemoveAll(ITimerCallback* pCaller)
 {
+    if (pCaller == NULL) return;
 #if defined(ESP32)
 	TIMER_MUTEX_LOCK();
 #endif 
@@ -180,9 +181,10 @@ void Timer::AddTimer(Timer *pTimer)
 }
 void Timer::RemoveTimer(Timer *pTimer)
 {
+    if (pTimer == NULL) return;
 #if defined(ESP32)
 	TIMER_MUTEX_LOCK();
-#endif 
+#endif
     for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
         if (pNode->pTimer == pTimer) {
             pNode->pTimer = NULL;

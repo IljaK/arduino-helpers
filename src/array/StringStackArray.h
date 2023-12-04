@@ -4,11 +4,10 @@
 
 class StringStackArray: public StackArray<char *>
 {
-protected:
+public:
     void FreeItem(char * item) override {
         free(item);
     }
-public:
     StringStackArray(const size_t maxSize):StackArray(maxSize) {}
 
     bool IsElementEqual(char * item1, char * item2) override

@@ -26,7 +26,8 @@ TEST(StringStackArrayTest, StackArrayTestAppendUnshift)
     item = callHangupStack.UnshiftFirst();
 
 	EXPECT_EQ(callHangupStack.Size(), 0);
-    free(item);
+    
+	callHangupStack.FreeItem(item);
 }
 
 TEST(ByteStackArrayTest, ByteStackArrayTestAppendUnshift)
@@ -51,7 +52,7 @@ TEST(ByteStackArrayTest, ByteStackArrayTestAppendUnshift)
 
 	EXPECT_EQ(arr->GetLength(), 10);
 
-	free(arr);
+	byteStackArray.FreeItem(arr);
 
 	EXPECT_EQ(byteStackArray.Size(), 1);
 
@@ -59,10 +60,10 @@ TEST(ByteStackArrayTest, ByteStackArrayTestAppendUnshift)
 
 	EXPECT_EQ(arr->GetLength(), 5);
 
-	free(arr);
+	byteStackArray.FreeItem(arr);
 
 	EXPECT_EQ(byteStackArray.Size(), 0);
-    //free(item);
+
 }
 TEST(ByteStackArrayTest, ByteStackArrayTestSpecial)
 {
@@ -83,13 +84,13 @@ TEST(ByteStackArrayTest, ByteStackArrayTestSpecial)
 
 	EXPECT_EQ(item->GetLength(), sizePerItem);
 
-	free(item);
+	byteStackArray.FreeItem(item);
 
 	item = byteStackArray.UnshiftFirst();
 
 	EXPECT_EQ(item->GetLength(), len - sizePerItem);
 
-	free(item);
+	byteStackArray.FreeItem(item);
 }
 
 TEST(ByteStackArrayTest, ByteStackArrayTestOverflow)
@@ -114,7 +115,7 @@ TEST(ByteStackArrayTest, ByteStackArrayTestOverflow)
 	for (int i = 0; i < size; i++) {
 		item = byteStackArray.UnshiftFirst();
 		EXPECT_EQ(item->GetLength(), sizePerItem);
-		delete item;
+	    byteStackArray.FreeItem(item);
 	}
 
 	EXPECT_EQ(false, byteStackArray.HasFilledPacket());

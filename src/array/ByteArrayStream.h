@@ -15,7 +15,7 @@ public:
         buffer = (uint8_t *)malloc(maxLength);
         length = 0;
     }
-    ~ByteArrayStream() {
+    virtual ~ByteArrayStream() {
         length = 0;
         free(buffer);
     }

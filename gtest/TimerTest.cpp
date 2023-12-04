@@ -123,7 +123,6 @@ TEST(TimerTest, TimerTestMultiRunStop)
     delete timer2;
     delete timer4;
 
-
     EXPECT_EQ(3, Timer::GetNodesCount());
     EXPECT_EQ(0, Timer::GetActiveNodesCount());
     EXPECT_EQ(0, Timer::GetRunningNodesCount());
