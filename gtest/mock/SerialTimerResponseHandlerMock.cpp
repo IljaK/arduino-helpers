@@ -10,14 +10,14 @@ SerialTimerResponseHandlerMock::~SerialTimerResponseHandlerMock()
 {
 }
 
-void SerialTimerResponseHandlerMock::OnResponseReceived(bool IsTimeOut, bool isOverFlow)
+void SerialTimerResponseHandlerMock::OnResponseReceived(bool isTimeOut, bool isOverFlow)
 {
 	if (registeredBytes > 0) {
 		serialStream->readBytes(receivedCommand, registeredBytes);
 	}
 	receivedLength = registeredBytes;
-	BaseSerialMock::HandleResponseReceived(IsTimeOut, isOverFlow);
-	SerialTimerResponseHandler::OnResponseReceived(IsTimeOut, isOverFlow);
+	BaseSerialMock::HandleResponseReceived(isTimeOut, isOverFlow);
+	SerialTimerResponseHandler::OnResponseReceived(isTimeOut, isOverFlow);
 }
 
 void SerialTimerResponseHandlerMock::Clear() {

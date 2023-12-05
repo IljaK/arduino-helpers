@@ -9,13 +9,13 @@ SerialCharResponseHandlerMock::~SerialCharResponseHandlerMock()
 {
 }
 
-void SerialCharResponseHandlerMock::OnResponseReceived(bool IsTimeOut, bool isOverFlow)
+void SerialCharResponseHandlerMock::OnResponseReceived(bool isTimeOut, bool isOverFlow)
 {
 	if (bufferLength > 0) {
 		strcpy(receivedCommand, buffer);
 	}
-	HandleResponseReceived(IsTimeOut, isOverFlow);
-	SerialCharResponseHandler::OnResponseReceived(IsTimeOut, isOverFlow);
+	HandleResponseReceived(isTimeOut, isOverFlow);
+	SerialCharResponseHandler::OnResponseReceived(isTimeOut, isOverFlow);
 }
 
 void SerialCharResponseHandlerMock::Clear() {

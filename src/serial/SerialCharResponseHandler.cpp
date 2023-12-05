@@ -117,8 +117,8 @@ bool SerialCharResponseHandler::AppendSymbolToBuffer(uint8_t symbol)
 	return true;
 }
 
-void SerialCharResponseHandler::ResponseDetectedInternal(bool IsTimeOut, bool isOverFlow) {
-	BaseSerialHandler::ResponseDetectedInternal(IsTimeOut, isOverFlow);
+void SerialCharResponseHandler::ResponseDetectedInternal(bool isTimeOut, bool isOverFlow) {
+	BaseSerialHandler::ResponseDetectedInternal(isTimeOut, isOverFlow);
 	ResetBuffer();
 }
 
@@ -144,10 +144,10 @@ bool SerialCharResponseHandler::IsLimitReached()
 	return bufferLength == bufferSize;
 }
 
-void SerialCharResponseHandler::OnResponseReceived(bool IsTimeOut, bool isOverFlow)
+void SerialCharResponseHandler::OnResponseReceived(bool isTimeOut, bool isOverFlow)
 {
     if (responseCallback != NULL) {
-        responseCallback((uint8_t *)buffer, bufferLength, IsTimeOut, isOverFlow);
+        responseCallback((uint8_t *)buffer, bufferLength, isTimeOut, isOverFlow);
     }
 }
 

@@ -9,6 +9,6 @@ public:
 	BaseSerialHandlerMock(Stream *serial);
 	~BaseSerialHandlerMock();
 
-	void OnResponseReceived(bool IsTimeOut, bool isOverFlow = false) override;
+	void OnResponseReceived(bool isTimeOut, bool isOverFlow = false) override;
 };
 

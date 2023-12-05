@@ -14,7 +14,7 @@ public:
 	BaseSerialMock(Stream* serial);
 	~BaseSerialMock();
 
-	void HandleResponseReceived(bool IsTimeOut, bool isOverFlow);
+	void HandleResponseReceived(bool isTimeOut, bool isOverFlow);
 
 	virtual void Clear();
 };

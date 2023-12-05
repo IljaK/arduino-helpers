@@ -12,7 +12,7 @@ protected:
 
 	void StartTimer();
 	void StopTimer();
-	void ResponseDetectedInternal(bool IsTimeOut, bool isOverFlow = false) override;
+	void ResponseDetectedInternal(bool isTimeOut, bool isOverFlow = false) override;
 
 public:
 	SerialTimerResponseHandler(Stream * serial, size_t serialRxBufferSize);

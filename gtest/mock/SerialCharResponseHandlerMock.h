@@ -11,7 +11,7 @@ public:
 	SerialCharResponseHandlerMock(const size_t bufferSize, const char *separator, Stream* stream);
 	virtual ~SerialCharResponseHandlerMock();
 
-	void OnResponseReceived(bool IsTimeOut, bool isOverFlow = false) override;
+	void OnResponseReceived(bool isTimeOut, bool isOverFlow = false) override;
 	void Clear() override;
 
     int read() override;

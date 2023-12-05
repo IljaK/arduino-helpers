@@ -13,7 +13,7 @@ private:
 	bool AppendSymbolToBuffer(uint8_t symbol);
 	bool IsSeparatorRemainMatch(int remainSeparatorLength, uint8_t symbol);
 protected:
-	void ResponseDetectedInternal(bool IsTimeOut, bool isOverFlow) override;
+	void ResponseDetectedInternal(bool isTimeOut, bool isOverFlow) override;
 	virtual void ResetBuffer();
 	virtual bool LoadSymbolFromBuffer(uint8_t symbol);
 	size_t bufferLength = 0;
@@ -36,7 +36,7 @@ public:
 	void FlushData() override;
     bool IsLimitReached();
 
-    void OnResponseReceived(bool IsTimeOut, bool isOverFlow = false) override;
+    void OnResponseReceived(bool isTimeOut, bool isOverFlow = false) override;
     virtual void SetExpectFixedLength(size_t expectFixedLength, uint32_t timeout);
 };
 

@@ -17,13 +17,13 @@ void BaseSerialHandler::OnTimerComplete(Timer *timer)
 	}
 }
 
-void BaseSerialHandler::ResponseDetectedInternal(bool IsTimeOut, bool isOverFlow)
+void BaseSerialHandler::ResponseDetectedInternal(bool isTimeOut, bool isOverFlow)
 {
 	StopTimeoutTimer();
-	OnResponseReceived(IsTimeOut, isOverFlow);
+	OnResponseReceived(isTimeOut, isOverFlow);
 }
 
-void BaseSerialHandler::OnResponseReceived(bool IsTimeOut, bool isOverFlow)
+void BaseSerialHandler::OnResponseReceived(bool isTimeOut, bool isOverFlow)
 {
 }
 

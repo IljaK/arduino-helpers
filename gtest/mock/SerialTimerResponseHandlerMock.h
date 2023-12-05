@@ -11,7 +11,7 @@ public:
 	SerialTimerResponseHandlerMock(Stream * serial);
 	~SerialTimerResponseHandlerMock();
 
-	void OnResponseReceived(bool IsTimeOut, bool isOverFlow = false) override;
+	void OnResponseReceived(bool isTimeOut, bool isOverFlow = false) override;
 	void Clear() override;
 };
 

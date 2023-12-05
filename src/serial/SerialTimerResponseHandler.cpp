@@ -86,10 +86,10 @@ void SerialTimerResponseHandler::FlushData()
 	BaseSerialHandler::FlushData();
 }
 
-void SerialTimerResponseHandler::ResponseDetectedInternal(bool IsTimeOut, bool isOverFlow)
+void SerialTimerResponseHandler::ResponseDetectedInternal(bool isTimeOut, bool isOverFlow)
 {
 	StopTimer();
-	BaseSerialHandler::ResponseDetectedInternal(IsTimeOut, isOverFlow);
+	BaseSerialHandler::ResponseDetectedInternal(isTimeOut, isOverFlow);
 }
 
 size_t SerialTimerResponseHandler::Available()
