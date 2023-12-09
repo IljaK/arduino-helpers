@@ -10,7 +10,6 @@ private:
 
         if (item == NULL) return 0;
 
-
         size_t append = maxItemLength - item->GetLength();
         if (append > length) append = length;
 

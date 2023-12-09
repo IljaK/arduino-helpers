@@ -2,12 +2,35 @@
 #include "StackArray.h"
 
 struct BinaryMessage {
-    uint8_t length;
-    uint8_t filled;
-    uint8_t * data;
+
+private:
+    size_t length = 0;
+    size_t filled = 0;
+    uint8_t * data = NULL;
+public:
+    BinaryMessage() {}
+    virtual ~BinaryMessage() {
+        FreeData();
+    }
+
+    void FreeData() {
+        if (data != NULL) {
+            free(data);
+            data = NULL;
+        }
+    }
 
     bool isFilled() {
-        return length == filled;
+        return filled >= length;
+    }
+    uint8_t *GetData() {
+        return data;
+    }
+    size_t GetLength() {
+        return length;
+    }
+    size_t GetFilled() {
+        return filled;
     }
 };
 
@@ -21,17 +44,13 @@ public:
     virtual ~BinaryMessageStack() {
         for(size_t i = 0; i < size; i++) {
             if (arr[i] == NULL) break;
-            free(arr[i]->data);
-            free(arr[i]);
+            FreeItem(arr[i]);
             arr[i] = NULL;
         }
     }
 
     void FreeItem(BinaryMessage * item) override {
-        if (item->data != NULL) {
-            free(item->data);
-        }
-        free(item);
+        delete item;
     }
 
     BinaryMessage * UnshiftLast() {
