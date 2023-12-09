@@ -16,9 +16,6 @@ TEST(BinaryMessageStackTest, BufferOverflowTest)
     EXPECT_TRUE(msg == NULL);
 
     msg = new BinaryMessage();
-    msg->data = NULL;
-    msg->filled = 0;
-    msg->length = 10;
 
     messageStack.Append(msg);
     EXPECT_EQ(messageStack.Size(), 1);
