@@ -16,7 +16,7 @@ bool SocketMessageBuffer::Append(SocketMessage *item) {
     if (size == maxSize) return false;
     arr[size] = item;
     size++;
-    return false;
+    return true;
 }
 
 bool SocketMessageBuffer::AppendItem() {
