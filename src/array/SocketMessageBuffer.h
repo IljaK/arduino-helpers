@@ -25,5 +25,5 @@ public:
 
     size_t TotalLength();
 
-    SocketMessage * Unshift(size_t index);
+    SocketMessage * Unshift(size_t index) override;
 };

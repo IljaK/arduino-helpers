@@ -14,9 +14,13 @@ private:
     uint8_t * data = NULL;
 public:
     SocketMessage(uint8_t lengthBytes) {
-        this->lengthBytes;
+        this->lengthBytes = lengthBytes;
     }
     ~SocketMessage() {
+        Clear();
+    }
+
+    void Clear() {
         if (data != NULL) {
             free(data);
             data = NULL;
@@ -27,6 +31,12 @@ public:
 
     bool IsFull() {
         return size > 0 && filled == size;
+    }
+
+    void SetData(uint8_t * data, size_t length, size_t maxMessageSize) {
+        Clear();
+        this->size = length;
+        AddData(data, length, maxMessageSize);
     }
 
     size_t AddData(uint8_t * data, size_t length, size_t maxMessageSize) {
