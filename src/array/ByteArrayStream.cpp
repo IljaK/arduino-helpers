@@ -69,6 +69,5 @@ void ByteArrayStream::Clear()
 {
     BUFFER_MUTEX_LOCK();
     length = 0;
-    bufferSize = 0;
     BUFFER_MUTEX_UNLOCK();
 }
