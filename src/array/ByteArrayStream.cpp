@@ -27,9 +27,10 @@ size_t ByteArrayStream::Read(uint8_t *buffer, size_t length)
 
     if (toRead > 0) {
         for(size_t i = 0; i < this->length; i++) {
-            buffer[i] = this->buffer[i];
-            if (i+toRead < this->length) {
-                this->buffer[i] = this->buffer[i+toRead];
+            if (i < toRead) {
+                buffer[i] = this->buffer[i];
+            } else {
+                this->buffer[i-toRead] = this->buffer[i];
             }
         }
         this->length -= toRead;
