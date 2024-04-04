@@ -435,3 +435,52 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
 }
 #endif
 */
+
+
+size_t PrintNumber(char *in, size_t inSize, unsigned long n, uint8_t base)
+{
+    if (inSize <= 1) {
+        return 0;
+    }
+    char buf[8 * sizeof(n) + 1]; // Assumes 8-bit chars plus zero byte.
+    char *str = &buf[sizeof(buf) - 1];
+
+    *str = '\0';
+
+    // prevent crash if called with base == 1
+    if(base < 2) {
+        base = 10;
+    }
+
+    do {
+        char c = n % base;
+        n /= base;
+
+        *--str = c < 10 ? c + '0' : c + 'A' - 10;
+    } while (n);
+
+    size_t len = strlen(str);
+    
+    if (len >= inSize) {
+        len = inSize - 1;
+    }
+
+    memcpy(in, str, len);
+    in[len] = 0;
+    return len;
+}
+
+size_t PrintNumber(char *in, size_t inSize, long n, uint8_t base)
+{
+    if (inSize <= 1) {
+        return 0;
+    }
+    int t = 0;
+    if (base == 10 && n < 0) {
+        //t = print('-');
+        in[0] = '-';
+        in[1] = 0;
+        n = -n;
+    }
+    return PrintNumber(in+1, inSize-1, static_cast<unsigned long>(n), base);
+}

@@ -66,3 +66,6 @@ extern size_t decodeFromHex(char *inBuffer, uint8_t *outArray, size_t length);
 // Checks target for null and allocates memory for new chat
 extern char *makeNewCopy(const char *target);
 extern bool makeSafeCopy(char *dest, const char *target, size_t destSize);
+
+extern size_t PrintNumber(char *in, size_t inSize, unsigned long n, uint8_t base = 10);
+extern size_t PrintNumber(char *in, size_t inSize, long n, uint8_t base = 10);
