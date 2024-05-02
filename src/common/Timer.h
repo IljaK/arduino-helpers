@@ -72,3 +72,22 @@ public:
         this->pTimer = pTimer;
     }
 };
+
+typedef void (*TimerStaticCb)(Timer *);
+
+class TimerStaticCallback: public ITimerCallback {
+private:
+    TimerStaticCb function;
+public:
+    TimerStaticCallback(TimerStaticCb function) {
+        this->function = function;
+    };
+	virtual ~TimerStaticCallback() {
+
+    };
+	void OnTimerComplete(Timer *timer) override {
+        if (function != NULL) {
+            function(timer);
+        } 
+    };
+};

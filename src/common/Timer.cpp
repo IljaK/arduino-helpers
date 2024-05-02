@@ -1,9 +1,15 @@
 #include "Timer.h"
 
+// TODO: definition for multi/single core
 #if defined(ESP32)
 SemaphoreHandle_t Timer::xTimerSemaphore = xSemaphoreCreateRecursiveMutex();
-#define TIMER_MUTEX_LOCK()    while (xSemaphoreTakeRecursive( xTimerSemaphore, portMAX_DELAY ) != pdPASS) {}
-#define TIMER_MUTEX_UNLOCK()  xSemaphoreGiveRecursive(xTimerSemaphore)
+
+#define TIMER_MUTEX_LOCK()    while (xSemaphoreTakeRecursive( xTimerSemaphore, portMAX_DELAY ) != pdPASS) {};
+#define TIMER_MUTEX_UNLOCK()  xSemaphoreGiveRecursive(xTimerSemaphore);
+
+#else
+    #define TIMER_MUTEX_LOCK()
+    #define TIMER_MUTEX_UNLOCK()
 #endif
 TimerNode *Timer::pFirst = NULL;
 
@@ -24,15 +30,14 @@ Timer::~Timer() {
 }
 
 void Timer::StartMicros(uint64_t durationMicros) {
-#if defined(ESP32)
+
 	TIMER_MUTEX_LOCK();
-#endif
+
     this->prevStamp = micros();
     this->remainMicros = durationMicros;
     this->state = TIMER_STATE_RUNNING;
-#if defined(ESP32)
+
     TIMER_MUTEX_UNLOCK();
-#endif
 }
 void Timer::StartMillis(uint64_t durationMillis) {
     StartMicros((uint64_t)durationMillis * (uint64_t)MICROS_IN_MILLIS);
@@ -42,30 +47,26 @@ void Timer::StartSeconds(uint64_t durationSeconds) {
 }
 
 void Timer::Stop() {
-#if defined(ESP32)
+
 	TIMER_MUTEX_LOCK();
-#endif
+
     if (!IsRunning()) {
-#if defined(ESP32)
         TIMER_MUTEX_UNLOCK();
-#endif
         return;
     }
     state = TIMER_STATE_NONE;
     remainMicros = 0;
-#if defined(ESP32)
+
     TIMER_MUTEX_UNLOCK();
-#endif
+
 }
 
 bool Timer::Update() {
-#if defined(ESP32)
+
 	TIMER_MUTEX_LOCK();
-#endif
+
     if (!IsRunning()) {
-#if defined(ESP32)
         TIMER_MUTEX_UNLOCK();
-#endif
         return false;
     }
 
@@ -76,16 +77,12 @@ bool Timer::Update() {
     if (delta >= remainMicros) {
         remainMicros = 0;
         state = TIMER_STATE_COMPLETED;
-#if defined(ESP32)
         TIMER_MUTEX_UNLOCK();
-#endif
         return true;
     }
     prevStamp = stamp;
     remainMicros -= delta;
-#if defined(ESP32)
     TIMER_MUTEX_UNLOCK();
-#endif
     return false;
 }
 
@@ -105,9 +102,7 @@ bool Timer::IsRunning() {
 
 void Timer::Loop()
 {
-#if defined(ESP32)
 	TIMER_MUTEX_LOCK();
-#endif
     // First pass Update timers
     for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
         if (pNode->pTimer != NULL && pNode->pTimer->Update()) {
@@ -138,33 +133,25 @@ void Timer::Loop()
         pNode = pNode->pNext;
     }
 
-#if defined(ESP32)
     TIMER_MUTEX_UNLOCK();
-#endif
 }
 
 void Timer::RemoveAll(ITimerCallback* pCaller)
 {
     if (pCaller == NULL) return;
-#if defined(ESP32)
 	TIMER_MUTEX_LOCK();
-#endif 
     for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
         if (pNode->pTimer != NULL && pCaller == pNode->pTimer->pCallback) {
             pNode->pTimer->pCallback = NULL;
             pNode->pTimer = NULL;
         }
     }
-#if defined(ESP32)
     TIMER_MUTEX_UNLOCK();
-#endif
 }
 
 void Timer::AddTimer(Timer *pTimer)
 {
-#if defined(ESP32)
 	TIMER_MUTEX_LOCK();
-#endif 
     if (pFirst == NULL) {
         pFirst = new TimerNode(pTimer);
     } else {
@@ -175,25 +162,19 @@ void Timer::AddTimer(Timer *pTimer)
             }
         }
     }
-#if defined(ESP32)
     TIMER_MUTEX_UNLOCK();
-#endif
 }
 void Timer::RemoveTimer(Timer *pTimer)
 {
     if (pTimer == NULL) return;
-#if defined(ESP32)
 	TIMER_MUTEX_LOCK();
-#endif
     for (TimerNode *pNode = pFirst; pNode; pNode = pNode->pNext) {
         if (pNode->pTimer == pTimer) {
             pNode->pTimer = NULL;
             break;
         }
     }
-#if defined(ESP32)
     TIMER_MUTEX_UNLOCK();
-#endif
 }
 
 
