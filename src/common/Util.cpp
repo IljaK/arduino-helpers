@@ -475,7 +475,6 @@ size_t PrintNumber(char *in, size_t inSize, long n, uint8_t base)
     if (inSize <= 1) {
         return 0;
     }
-    int t = 0;
     if (base == 10 && n < 0) {
         //t = print('-');
         in[0] = '-';
