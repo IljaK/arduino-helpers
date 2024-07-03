@@ -27,27 +27,23 @@ uint8_t setBitOfByte(uint8_t target, bool value, uint8_t index)
     return target;
 }
 
-uint8_t getBitsValue(uint8_t * target, uint8_t length, uint8_t start)
+uint8_t getBitsValue(uint8_t target, uint8_t length, uint8_t start)
 {
 	uint8_t headerShift = (8u - start - length);
-	uint8_t result = *target;
-	result = result << headerShift;
-	result = result >> (headerShift + start);
-
-	return result;
+	target = target << headerShift;
+	target = target >> (headerShift + start);
+	return target;
 }
 
-uint16_t getBitsValue(uint16_t * target, uint8_t length, uint8_t start)
+uint16_t getBitsValue(uint16_t target, uint8_t length, uint8_t start)
 {
 	uint16_t headerShift = ((16u) - start - length);
-	uint16_t result = *target;
-	result = result << headerShift;
-	result = result >> (headerShift + start);
-
-	return result;
+	target = target << headerShift;
+	target = target >> (headerShift + start);
+	return target;
 }
 
-void setBitsValue(uint8_t * target, uint8_t value, uint8_t length, uint8_t start)
+uint8_t setBitsValue(uint8_t target, uint8_t value, uint8_t length, uint8_t start)
 {
 	uint8_t headerShift = (8u - start - length);
 
@@ -55,21 +51,18 @@ void setBitsValue(uint8_t * target, uint8_t value, uint8_t length, uint8_t start
 	mask = mask >> headerShift;
 	mask = ~mask;
 
-	uint8_t result = *target;
-
 	// Flush require bits
-	result = result & mask;
+	target = target & mask;
 
 	// Flush value header + shift to position
 	value = (value << (headerShift + start)) >> headerShift;
 
 	// Store bits
-	result = result | value;
+	return target | value;
 
-	*target = result;
 }
 
-void setBitsValue(uint16_t* target, uint16_t value, uint8_t length, uint8_t start)
+uint16_t setBitsValue(uint16_t target, uint16_t value, uint8_t length, uint8_t start)
 {
 	uint16_t headerShift = ((16u) - start - length);
 
@@ -77,18 +70,14 @@ void setBitsValue(uint16_t* target, uint16_t value, uint8_t length, uint8_t star
 	mask = mask >> headerShift;
 	mask = ~mask;
 
-	uint16_t result = *target;
-
 	// Flush require bits
-	result = result & mask;
+	target = target & mask;
 
 	// Flush value header + shift to position
 	value = (value << (headerShift + start)) >> headerShift;
 
 	// Store bits
-	result = result | value;
-
-	*target = result;
+	return target | value;
 }
 
 
