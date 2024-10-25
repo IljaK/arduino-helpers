@@ -44,7 +44,7 @@ bool SerialCharResponseHandler::LoadSymbolFromBuffer(uint8_t symbol)
             expectFixedLength = 0;
             ResponseDetectedInternal(false, true);
             return true;
-        }
+        } 
         if (bufferLength >= expectFixedLength) {
             expectFixedLength = 0;
             ResponseDetectedInternal(false, false);
@@ -130,6 +130,7 @@ bool SerialCharResponseHandler::IsBusy()
 void SerialCharResponseHandler::FlushData()
 {
 	ResetBuffer();
+    expectFixedLength = 0;
 	BaseSerialHandler::FlushData();
 }
 
@@ -171,4 +172,9 @@ void SerialCharResponseHandler::SetExpectFixedLength(size_t expectFixedLength, u
 {
     this->expectFixedLength = expectFixedLength;
     StartTimeoutTimer(timeout);
+}
+
+size_t SerialCharResponseHandler::GetRemainExpectedSize()
+{
+    return expectFixedLength;
 }

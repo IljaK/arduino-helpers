@@ -38,5 +38,7 @@ public:
 
     void OnResponseReceived(bool isTimeOut, bool isOverFlow = false) override;
     virtual void SetExpectFixedLength(size_t expectFixedLength, uint32_t timeout);
+
+    size_t GetRemainExpectedSize();
 };
 
