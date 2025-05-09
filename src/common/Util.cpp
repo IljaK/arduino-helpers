@@ -239,9 +239,9 @@ void outPrintf(const char *format, ...)
 */
 
 long readVCC() {
-#if ARDUINO_TEST 
+#if defined(ARDUINO_TEST)
 	return 5000;
-#elif ESP32 || ARDUINO_ARCH_SAMD
+#elif defined(ESP32) || defined(ARDUINO_ARCH_SAMD)
 	return 3300;
 #else
 	long result; // Read 1.1V reference against AVcc 
